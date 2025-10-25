@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate auto rickshaw fares in Mumbai - Official government-approved rates">
+    <title>Fare Calculator - Mumbai Share Auto</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🛺 Mumbai Share Auto</div>
+
+            <!-- Desktop Navigation -->
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="fare-calculator.html">Fare Calculator</a></li>
+                <li><a href="stands-map.html">Find Stands</a></li>
+                <li><a href="route-finder.html">Route Finder</a></li>
+                <li><a href="safety.html">Safety</a></li>
+            </ul>
+
+            <!-- Hamburger Menu Icon -->
+            <button class="hamburger" aria-label="Open navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-backdrop"></div>
+    <div class="mobile-menu" aria-hidden="true">
+        <button class="mobile-menu-close" aria-label="Close navigation menu">&times;</button>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="fare-calculator.html">Fare Calculator</a></li>
+            <li><a href="stands-map.html">Find Stands</a></li>
+            <li><a href="route-finder.html">Route Finder</a></li>
+            <li><a href="safety.html">Safety</a></li>
+        </ul>
+    </div>
+
+    <!-- Fare Information Card Section -->
+    <section class="info-section">
+        <div class="info-card">
+            <h2 class="info-title">Official Fare Rates</h2>
+            <ul class="rate-list">
+                <li>Base fare: <strong>₹26</strong> for first <strong>1.5 km</strong></li>
+                <li>Additional distance: <strong>₹17.14</strong> per km</li>
+                <li>Waiting charge: <strong>₹3</strong> per minute</li>
+                <li>Night surcharge: <strong>25%</strong> extra (<strong>12 AM - 5 AM</strong>)</li>
+            </ul>
+            <p class="rate-note">Rates effective from February 2025 (Maharashtra Govt.)</p>
+        </div>
+    </section>
+
+    <!-- Calculator Form Section -->
+    <section class="calculator-section">
+        <div class="calculator-card">
+            <h1 class="page-title">Auto Rickshaw Fare Calculator</h1>
+            <p class="subtitle">Calculate your fare based on Mumbai government-approved rates</p>
+
+            <form id="fareCalculatorForm">
+                <!-- Distance Input -->
+                <div class="form-group">
+                    <label for="distance">Distance (km)</label>
+                    <input type="number" id="distance" name="distance"
+                           placeholder="Enter distance in km"
+                           min="0" step="0.1" required>
+                </div>
+
+                <!-- Waiting Time Input -->
+                <div class="form-group">
+                    <label for="waitingTime">Waiting Time (minutes)</label>
+                    <input type="number" id="waitingTime" name="waitingTime"
+                           placeholder="Enter waiting time"
+                           min="0" step="1" value="0">
+                </div>
+
+                <!-- Time of Day Dropdown -->
+                <div class="form-group">
+                    <label for="timeOfDay">Time of Day</label>
+                    <select id="timeOfDay" name="timeOfDay">
+                        <option value="normal">Normal Hours (5 AM - 12 AM)</option>
+                        <option value="night">Night Hours (12 AM - 5 AM) - 25% extra</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="calculateBtn" class="btn btn-primary">
+                    Calculate Fare
+                </button>
+
+                <!-- Error Message (hidden by default) -->
+                <div class="error-message" id="errorMessage"></div>
+            </form>
+
+            <!-- Results Container (hidden by default) -->
+            <div class="results-container" id="resultsContainer">
+                <h2 class="section-heading">Fare Breakdown</h2>
+
+                <!-- Base Fare Card (always visible after calculation) -->
+                <div class="charge-card" id="baseFareCard">
+                    <span class="charge-label">Base Fare (1.5 km)</span>
+                    <span class="charge-value">₹26.00</span>
+                </div>
+
+                <!-- Distance Charge Card (conditional) -->
+                <div class="charge-card" id="distanceCard" style="display: none;">
+                    <span class="charge-label" id="distanceLabel">Distance Charge</span>
+                    <span class="charge-value" id="distanceValue">₹0.00</span>
+                </div>
+
+                <!-- Waiting Charge Card (conditional) -->
+                <div class="charge-card" id="waitingCard" style="display: none;">
+                    <span class="charge-label" id="waitingLabel">Waiting Charge</span>
+                    <span class="charge-value" id="waitingValue">₹0.00</span>
+                </div>
+
+                <!-- Night Surcharge Card (conditional) -->
+                <div class="charge-card" id="nightCard" style="display: none;">
+                    <span class="charge-label">Night Surcharge (25%)</span>
+                    <span class="charge-value" id="nightValue">₹0.00</span>
+                </div>
+
+                <!-- Total Card (always visible after calculation) -->
+                <div class="total-card">
+                    <div class="total-label">TOTAL FARE</div>
+                    <div class="total-amount" id="totalAmount">₹0.00</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <p class="footer-copyright">&copy; 2024 Mumbai Share Auto Finder. All rights reserved.</p>
+                <p class="footer-disclaimer">Fares and routes are indicative. Please verify with drivers.</p>
+            </div>
+            <div class="footer-right">
+                <h3 class="footer-heading">Quick Links</h3>
+                <nav class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="fare-calculator.html">Fare Calculator</a>
+                    <a href="stands-map.html">Find Stands</a>
+                    <a href="route-finder.html">Route Finder</a>
+                    <a href="safety.html">Safety</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

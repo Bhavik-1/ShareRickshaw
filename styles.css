@@ -563,3 +563,266 @@ ul {
         padding: 24px;
     }
 }
+
+/* ========================================
+   Fare Calculator Page Styles
+   ======================================== */
+
+/* Info Section Styles */
+.info-section {
+    background: #ffffff;
+    padding: 60px 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.info-card {
+    background: #f0f7ff;
+    border: 2px solid var(--color-primary);
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 700px;
+    width: 100%;
+}
+
+.info-title {
+    font-size: 24px;
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.rate-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rate-list li {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+    margin-bottom: 12px;
+}
+
+.rate-note {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Calculator Section Styles */
+.calculator-section {
+    background: var(--color-bg-light);
+    padding: 80px 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.page-title {
+    font-size: 36px;
+    text-align: center;
+    color: var(--color-text-primary);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    margin-bottom: 30px;
+}
+
+.calculator-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 32px;
+    max-width: 600px;
+    width: 100%;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 16px;
+    background: #ffffff;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+}
+
+.error-message {
+    color: #d32f2f;
+    font-size: 14px;
+    margin-top: 10px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+/* Results Section Styles */
+.results-container {
+    margin-top: 40px;
+    display: none;
+}
+
+.results-container.show {
+    display: block;
+}
+
+.results-container .section-heading {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--color-text-primary);
+}
+
+.charge-card {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.charge-label {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+.charge-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.total-card {
+    background: var(--color-primary);
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    margin-top: 15px;
+}
+
+.total-label {
+    font-size: 14px;
+    margin-bottom: 8px;
+    opacity: 0.9;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.total-amount {
+    font-size: 36px;
+    font-weight: 700;
+}
+
+/* Button Modifications */
+.btn.btn-primary.full-width {
+    width: 100%;
+}
+
+.btn.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ========================================
+   Fare Calculator Responsive Styles
+   ======================================== */
+
+@media (max-width: 768px) {
+    .info-section {
+        padding: 40px 20px;
+    }
+
+    .info-card {
+        padding: 20px;
+    }
+
+    .info-title {
+        font-size: 20px;
+    }
+
+    .rate-list li {
+        font-size: 15px;
+    }
+
+    .calculator-section {
+        padding: 60px 20px;
+    }
+
+    .page-title {
+        font-size: 28px;
+    }
+
+    .subtitle {
+        font-size: 15px;
+    }
+
+    .calculator-card {
+        padding: 24px;
+    }
+
+    .charge-card {
+        padding: 12px;
+    }
+
+    .charge-label {
+        font-size: 13px;
+    }
+
+    .charge-value {
+        font-size: 16px;
+    }
+
+    .total-amount {
+        font-size: 28px;
+    }
+}

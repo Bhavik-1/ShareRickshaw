@@ -98,10 +98,196 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ========================================
-    // Smooth Scroll Enhancement (Optional)
+    // Fare Calculator (only runs on fare-calculator.html)
     // ========================================
 
-    // Currently not needed since all links navigate to different pages
-    // Can be added later if anchor links within the same page are needed
+    const calculatorForm = document.getElementById('fareCalculatorForm');
+
+    if (calculatorForm) {
+        // Fare rate constants (Mumbai government-approved rates)
+        const FARE_RATES = {
+            baseFare: 26,           // ₹26 for first 1.5 km
+            baseDistance: 1.5,      // First 1.5 km included in base
+            perKmRate: 17.14,       // ₹17.14 per additional km
+            waitingRate: 3,         // ₹3 per minute
+            nightSurcharge: 0.25    // 25% surcharge
+        };
+
+        // Get form elements
+        const distanceInput = document.getElementById('distance');
+        const waitingTimeInput = document.getElementById('waitingTime');
+        const timeOfDaySelect = document.getElementById('timeOfDay');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultsContainer = document.getElementById('resultsContainer');
+
+        // Get result card elements
+        const distanceCard = document.getElementById('distanceCard');
+        const distanceLabel = document.getElementById('distanceLabel');
+        const distanceValue = document.getElementById('distanceValue');
+        const waitingCard = document.getElementById('waitingCard');
+        const waitingLabel = document.getElementById('waitingLabel');
+        const waitingValue = document.getElementById('waitingValue');
+        const nightCard = document.getElementById('nightCard');
+        const nightValue = document.getElementById('nightValue');
+        const totalAmount = document.getElementById('totalAmount');
+
+        /**
+         * Show error message
+         */
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            resultsContainer.classList.remove('show');
+        }
+
+        /**
+         * Hide error message
+         */
+        function hideError() {
+            errorMessage.textContent = '';
+            errorMessage.classList.remove('show');
+        }
+
+        /**
+         * Calculate fare based on inputs
+         */
+        function calculateFare(distance, waitingTime, timeOfDay) {
+            // Step 1: Base fare (always ₹26)
+            const baseFare = FARE_RATES.baseFare;
+
+            // Step 2: Calculate distance charge
+            let distanceCharge = 0;
+            let extraDistance = 0;
+            if (distance > FARE_RATES.baseDistance) {
+                extraDistance = distance - FARE_RATES.baseDistance;
+                distanceCharge = extraDistance * FARE_RATES.perKmRate;
+            }
+
+            // Step 3: Calculate waiting charge
+            const waitingCharge = waitingTime * FARE_RATES.waitingRate;
+
+            // Step 4: Calculate subtotal
+            const subtotal = baseFare + distanceCharge + waitingCharge;
+
+            // Step 5: Calculate night surcharge (if applicable)
+            let nightSurcharge = 0;
+            if (timeOfDay === 'night') {
+                nightSurcharge = subtotal * FARE_RATES.nightSurcharge;
+            }
+
+            // Step 6: Calculate total
+            const totalFare = subtotal + nightSurcharge;
+
+            return {
+                baseFare: baseFare,
+                distanceCharge: distanceCharge,
+                extraDistance: extraDistance,
+                waitingCharge: waitingCharge,
+                nightSurcharge: nightSurcharge,
+                totalFare: totalFare
+            };
+        }
+
+        /**
+         * Update UI with calculation results
+         */
+        function updateResultsUI(fareBreakdown, distance, waitingTime, timeOfDay) {
+            // Hide error message
+            hideError();
+
+            // Show results container
+            resultsContainer.classList.add('show');
+
+            // Update distance charge card (conditional)
+            if (distance > FARE_RATES.baseDistance) {
+                distanceCard.style.display = 'flex';
+                distanceLabel.textContent = 'Distance Charge (' + fareBreakdown.extraDistance.toFixed(1) + ' km)';
+                distanceValue.textContent = '₹' + fareBreakdown.distanceCharge.toFixed(2);
+            } else {
+                distanceCard.style.display = 'none';
+            }
+
+            // Update waiting charge card (conditional)
+            if (waitingTime > 0) {
+                waitingCard.style.display = 'flex';
+                waitingLabel.textContent = 'Waiting Charge (' + waitingTime + ' mins)';
+                waitingValue.textContent = '₹' + fareBreakdown.waitingCharge.toFixed(2);
+            } else {
+                waitingCard.style.display = 'none';
+            }
+
+            // Update night surcharge card (conditional)
+            if (timeOfDay === 'night') {
+                nightCard.style.display = 'flex';
+                nightValue.textContent = '₹' + fareBreakdown.nightSurcharge.toFixed(2);
+            } else {
+                nightCard.style.display = 'none';
+            }
+
+            // Update total amount (always visible)
+            totalAmount.textContent = '₹' + fareBreakdown.totalFare.toFixed(2);
+        }
+
+        /**
+         * Handle form submission
+         */
+        calculatorForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get button element
+            const button = calculateBtn;
+
+            // Show loading state
+            button.textContent = 'Calculating...';
+            button.disabled = true;
+
+            // Use setTimeout to show loading state for minimum 300ms
+            setTimeout(function() {
+                // Get input values
+                const distance = parseFloat(distanceInput.value);
+                let waitingTime = parseFloat(waitingTimeInput.value);
+                const timeOfDay = timeOfDaySelect.value;
+
+                // Validation: Distance
+                if (!distance || distance <= 0) {
+                    showError('Please enter a valid distance greater than 0');
+                    button.textContent = 'Calculate Fare';
+                    button.disabled = false;
+                    return;
+                }
+
+                // Validation: Waiting time (default to 0 if empty)
+                if (!waitingTime || isNaN(waitingTime)) {
+                    waitingTime = 0;
+                }
+
+                // Validation: Negative waiting time
+                if (waitingTime < 0) {
+                    showError('Waiting time cannot be negative');
+                    button.textContent = 'Calculate Fare';
+                    button.disabled = false;
+                    return;
+                }
+
+                // Round waiting time to nearest integer
+                waitingTime = Math.floor(waitingTime);
+
+                try {
+                    // Calculate fare
+                    const fareBreakdown = calculateFare(distance, waitingTime, timeOfDay);
+
+                    // Update UI with results
+                    updateResultsUI(fareBreakdown, distance, waitingTime, timeOfDay);
+                } catch (error) {
+                    showError('Invalid input values');
+                }
+
+                // Reset button state
+                button.textContent = 'Calculate Fare';
+                button.disabled = false;
+            }, 300);
+        });
+    }
 
 });
