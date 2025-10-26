@@ -38,53 +38,53 @@ INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, d
 (2, 'Chakala', 25.00, '18 mins', 19.11500000, 72.86000000);
 
 -- Stand 3: Dadar TT (4 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(3, 'Shivaji Park', 15.00, '12 mins'),
-(3, 'Parel', 20.00, '15 mins'),
-(3, 'Mahim', 15.00, '10 mins'),
-(3, 'Wadala', 20.00, '15 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(3, 'Shivaji Park', 15.00, '12 mins', 19.03000000, 72.83700000),
+(3, 'Parel', 20.00, '15 mins', 19.01300000, 72.84000000),
+(3, 'Mahim', 15.00, '10 mins', 19.04100000, 72.84100000),
+(3, 'Wadala', 20.00, '15 mins', 19.01700000, 72.85800000);
 
 -- Stand 4: Kurla Station West (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(4, 'Kurla Market', 10.00, '8 mins'),
-(4, 'Nehru Nagar', 15.00, '12 mins'),
-(4, 'Bandra Kurla Complex', 25.00, '20 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(4, 'Kurla Market', 10.00, '8 mins', 19.07100000, 72.88200000),
+(4, 'Nehru Nagar', 15.00, '12 mins', 19.07800000, 72.88800000),
+(4, 'Bandra Kurla Complex', 25.00, '20 mins', 19.06250000, 72.86830000);
 
 -- Stand 5: Ghatkopar Station East (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(5, 'Asalpha', 15.00, '12 mins'),
-(5, 'Pant Nagar', 20.00, '15 mins'),
-(5, 'Vikhroli', 25.00, '20 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(5, 'Asalpha', 15.00, '12 mins', 19.08000000, 72.91500000),
+(5, 'Pant Nagar', 20.00, '15 mins', 19.07300000, 72.91200000),
+(5, 'Vikhroli', 25.00, '20 mins', 19.10250000, 72.92500000);
 
 -- Stand 6: Chembur Colony (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(6, 'Chembur Naka', 10.00, '8 mins'),
-(6, 'Tilak Nagar', 20.00, '15 mins'),
-(6, 'Govandi', 15.00, '12 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(6, 'Chembur Naka', 10.00, '8 mins', 19.05800000, 72.89800000),
+(6, 'Tilak Nagar', 20.00, '15 mins', 19.04700000, 72.90500000),
+(6, 'Govandi', 15.00, '12 mins', 19.04500000, 72.91200000);
 
 -- Stand 7: Malad Station West (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(7, 'Orlem', 15.00, '10 mins'),
-(7, 'Malad Market', 10.00, '8 mins'),
-(7, 'Goregaon Link Road', 20.00, '15 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(7, 'Orlem', 15.00, '10 mins', 19.19000000, 72.84200000),
+(7, 'Malad Market', 10.00, '8 mins', 19.18600000, 72.85000000),
+(7, 'Goregaon Link Road', 20.00, '15 mins', 19.17000000, 72.85000000);
 
 -- Stand 8: Borivali Station East (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(8, 'Shimpoli', 15.00, '12 mins'),
-(8, 'Poisar', 20.00, '15 mins'),
-(8, 'Mandpeshwar', 15.00, '10 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(8, 'Shimpoli', 15.00, '12 mins', 19.22000000, 72.84700000),
+(8, 'Poisar', 20.00, '15 mins', 19.22800000, 72.86200000),
+(8, 'Mandpeshwar', 15.00, '10 mins', 19.24000000, 72.85800000);
 
 -- Stand 9: Powai Market (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(9, 'Hiranandani', 15.00, '10 mins'),
-(9, 'IIT Bombay', 20.00, '12 mins'),
-(9, 'Chandivali', 25.00, '15 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(9, 'Hiranandani', 15.00, '10 mins', 19.11700000, 72.91400000),
+(9, 'IIT Bombay', 20.00, '12 mins', 19.13340000, 72.91330000),
+(9, 'Chandivali', 25.00, '15 mins', 19.10600000, 72.89600000);
 
 -- Stand 10: Vikhroli Station West (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(10, 'Kannamwar Nagar', 15.00, '12 mins'),
-(10, 'Vikhroli Park Site', 20.00, '15 mins'),
-(10, 'Kanjurmarg', 25.00, '18 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(10, 'Kannamwar Nagar', 15.00, '12 mins', 19.11500000, 72.93500000),
+(10, 'Vikhroli Park Site', 20.00, '15 mins', 19.09500000, 72.92800000),
+(10, 'Kanjurmarg', 25.00, '18 mins', 19.12800000, 72.93800000);
 
 -- Verification queries (optional, for testing)
 -- SELECT COUNT(*) as user_count FROM users; -- Should return 1
