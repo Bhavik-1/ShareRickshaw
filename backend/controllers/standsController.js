@@ -84,7 +84,7 @@ exports.getById = async (req, res) => {
 
     // Get routes for this stand
     const [routes] = await db.query(
-      'SELECT id, destination, fare, travel_time FROM routes WHERE stand_id = ? ORDER BY destination',
+      'SELECT id, destination, fare, travel_time, destination_lat, destination_lng FROM routes WHERE stand_id = ? ORDER BY destination',
       [id]
     );
 
@@ -100,7 +100,9 @@ exports.getById = async (req, res) => {
           id: route.id,
           destination: route.destination,
           fare: parseFloat(route.fare),
-          travel_time: route.travel_time
+          travel_time: route.travel_time,
+          destination_lat: route.destination_lat ? parseFloat(route.destination_lat) : null,
+          destination_lng: route.destination_lng ? parseFloat(route.destination_lng) : null
         }))
       }
     });
