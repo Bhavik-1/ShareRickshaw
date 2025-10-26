@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Find the best share auto routes in Mumbai. Select your origin stand and destination to see available routes with fares, distances, and travel times.">
+    <title>Route Finder - Mumbai Share Auto Finder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🛺 Mumbai Share Auto</div>
+
+            <!-- Desktop Navigation -->
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="fare-calculator.html">Fare Calculator</a></li>
+                <li><a href="stands-map.html">Find Stands</a></li>
+                <li><a href="route-finder.html" class="active">Route Finder</a></li>
+                <li><a href="safety.html">Safety</a></li>
+            </ul>
+
+            <!-- Hamburger Menu Icon -->
+            <button class="hamburger" aria-label="Open navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-backdrop"></div>
+    <div class="mobile-menu" aria-hidden="true">
+        <button class="mobile-menu-close" aria-label="Close navigation menu">&times;</button>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="fare-calculator.html">Fare Calculator</a></li>
+            <li><a href="stands-map.html">Find Stands</a></li>
+            <li><a href="route-finder.html" class="active">Route Finder</a></li>
+            <li><a href="safety.html">Safety</a></li>
+        </ul>
+    </div>
+
+    <!-- Page Header Section -->
+    <section class="page-header">
+        <h1>Find Best Share Auto Routes</h1>
+        <p class="subtitle">Select your origin stand and destination to see available routes.</p>
+    </section>
+
+    <!-- Main Content Container -->
+    <section class="calculator-section">
+        <div style="max-width: 1200px; margin: 0 auto; width: 100%;">
+            <!-- Form Card -->
+            <div class="calculator-card">
+                <form id="routeFinderForm">
+                    <!-- From Stand Dropdown -->
+                    <div class="form-group">
+                        <label for="standSelect">From (Stand)</label>
+                        <select id="standSelect" class="form-select" required>
+                            <option value="">-- Select a Stand --</option>
+                        </select>
+                        <div id="standError" class="error-message"></div>
+                    </div>
+
+                    <!-- Destination Input -->
+                    <div class="form-group">
+                        <label for="destinationInput">Destination</label>
+                        <input
+                            type="text"
+                            id="destinationInput"
+                            class="form-input"
+                            placeholder="e.g., Linking Road, Bandra Market"
+                            required
+                        >
+                        <div id="destinationError" class="error-message"></div>
+                    </div>
+
+                    <!-- Button Group -->
+                    <div class="button-group">
+                        <button type="button" id="findRouteBtn" class="btn btn-primary">Find Route</button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="resultsContainer" class="results-container">
+                    <h2 id="resultsHeader" class="section-heading"></h2>
+                    <div id="routeCardsContainer"></div>
+                    <div id="noResultsMessage" class="no-results-message" style="display: none;">
+                        No direct share-auto route found. Try nearby stands.
+                    </div>
+                </div>
+
+                <!-- Recent Searches Section -->
+                <div id="recentSearchesContainer" class="recent-searches" style="display: none;">
+                    <h3>Recent Searches</h3>
+                    <div id="recentSearchesList"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <p class="footer-copyright">&copy; 2024 Mumbai Share Auto Finder. All rights reserved.</p>
+                <p class="footer-disclaimer">Fares and routes are indicative. Please verify with drivers.</p>
+            </div>
+            <div class="footer-right">
+                <h3 class="footer-heading">Quick Links</h3>
+                <nav class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="fare-calculator.html">Fare Calculator</a>
+                    <a href="stands-map.html">Find Stands</a>
+                    <a href="route-finder.html">Route Finder</a>
+                    <a href="safety.html">Safety</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
+    <noscript>For the best experience, please enable JavaScript</noscript>
+    <script src="script.js"></script>
+    <script src="route-finder.js"></script>
+</body>
+</html>
