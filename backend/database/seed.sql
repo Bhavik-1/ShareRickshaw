@@ -26,16 +26,16 @@ INSERT INTO stands (name, latitude, longitude, operating_hours) VALUES
 
 -- Insert routes for each stand
 -- Stand 1: Bandra Station West (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(1, 'Linking Road', 15.00, '10 mins'),
-(1, 'Bandra Reclamation', 20.00, '15 mins'),
-(1, 'Pali Hill', 25.00, '12 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(1, 'Linking Road', 15.00, '10 mins', 19.05960000, 72.82950000),
+(1, 'Bandra Reclamation', 20.00, '15 mins', 19.04500000, 72.82200000),
+(1, 'Pali Hill', 25.00, '12 mins', 19.06300000, 72.82900000);
 
 -- Stand 2: Andheri Station East (3 routes)
-INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
-(2, 'MIDC', 20.00, '15 mins'),
-(2, 'Marol Naka', 15.00, '10 mins'),
-(2, 'Chakala', 25.00, '18 mins');
+INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, destination_lng) VALUES
+(2, 'MIDC', 20.00, '15 mins', 19.12030000, 72.86800000),
+(2, 'Marol Naka', 15.00, '10 mins', 19.11000000, 72.87000000),
+(2, 'Chakala', 25.00, '18 mins', 19.11500000, 72.86000000);
 
 -- Stand 3: Dadar TT (4 routes)
 INSERT INTO routes (stand_id, destination, fare, travel_time) VALUES
