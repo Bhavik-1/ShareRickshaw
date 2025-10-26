@@ -82,8 +82,12 @@ function fetchStands() {
             return response.json();
         })
         .then(data => {
-            standsData = data;
-            populateStandDropdown(standsData);
+            if (data.success) {
+                standsData = data.stands;
+                populateStandDropdown(standsData);
+            } else {
+                throw new Error('Failed to load stands');
+            }
         })
         .catch(error => {
             console.error('Error fetching stands:', error);
