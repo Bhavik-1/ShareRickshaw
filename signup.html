@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Mumbai Share Auto</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .signup-container {
+            max-width: 800px;
+            margin: 80px auto 40px;
+            padding: 20px;
+        }
+
+        .signup-heading {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: #1a1a1a;
+        }
+
+        .role-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .role-card {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .role-card:hover {
+            border-color: #2196F3;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .role-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .role-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+        }
+
+        .role-description {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .role-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #2196F3;
+            color: #fff;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .role-card:hover .role-button {
+            background: #1976D2;
+        }
+
+        .login-link-container {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .login-link-container a {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link-container a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .signup-heading {
+                font-size: 1.5rem;
+            }
+
+            .role-cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🛺 Mumbai Share Auto</div>
+
+            <!-- Desktop Navigation -->
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="fare-calculator.html">Fare Calculator</a></li>
+                <li><a href="stands-map.html">Find Stands</a></li>
+                <li><a href="route-finder.html">Route Finder</a></li>
+                <li><a href="safety.html">Safety</a></li>
+            </ul>
+
+            <!-- Hamburger Menu Icon -->
+            <button class="hamburger" aria-label="Open navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-backdrop"></div>
+    <div class="mobile-menu" aria-hidden="true">
+        <button class="mobile-menu-close" aria-label="Close navigation menu">&times;</button>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="fare-calculator.html">Fare Calculator</a></li>
+            <li><a href="stands-map.html">Find Stands</a></li>
+            <li><a href="route-finder.html">Route Finder</a></li>
+            <li><a href="safety.html">Safety</a></li>
+        </ul>
+    </div>
+
+    <!-- Signup Container -->
+    <div class="signup-container">
+        <h1 class="signup-heading">Choose Your Account Type</h1>
+
+        <div class="role-cards-container">
+            <!-- Passenger Card -->
+            <a href="signup-user.html" class="role-card">
+                <div class="role-icon">👤</div>
+                <h2 class="role-title">I'm a Passenger</h2>
+                <p class="role-description">Find share autos, calculate fares, plan routes</p>
+                <div class="role-button">Continue as User</div>
+            </a>
+
+            <!-- Autowala Card -->
+            <a href="signup-autowala.html" class="role-card">
+                <div class="role-icon">🛺</div>
+                <h2 class="role-title">I'm an Autowala</h2>
+                <p class="role-description">Register your auto and driver details</p>
+                <div class="role-button">Continue as Driver</div>
+            </a>
+        </div>
+
+        <div class="login-link-container">
+            Already have an account? <a href="login.html">Login</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <p class="footer-copyright">&copy; 2024 Mumbai Share Auto Finder. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
