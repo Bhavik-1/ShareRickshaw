@@ -8,6 +8,7 @@ require('./config/database');
 
 // Import route modules
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
 const standsRoutes = require('./routes/stands');
 const routesRoutes = require('./routes/routes');
 
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
 app.use('/api/stands', standsRoutes);
 app.use('/api/routes', routesRoutes);
 
@@ -40,6 +42,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',
+      profile: '/api/profile',
       stands: '/api/stands',
       routes: '/api/routes'
     }
