@@ -5,13 +5,53 @@
 -- USE mumbai_share_auto;
 
 -- Table: users
--- Purpose: Store admin user accounts for authentication
+-- Purpose: Store user accounts for authentication (admin, regular users, autowalas)
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
+  role ENUM('admin', 'user', 'autowala') DEFAULT 'user' NOT NULL,
+  phone_number VARCHAR(15),
+  full_name VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: autowala_details
+-- Purpose: Store autowala-specific information (driver and auto details)
+CREATE TABLE IF NOT EXISTS autowala_details (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  license_plate VARCHAR(20) NOT NULL UNIQUE,
+  driver_name VARCHAR(100) NOT NULL,
+  operating_location VARCHAR(100),
+  driver_phone VARCHAR(15),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_autowala_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+  INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: emergency_contacts
+-- Purpose: Store emergency contacts for regular users
+CREATE TABLE IF NOT EXISTS emergency_contacts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  contact_name VARCHAR(100) NOT NULL,
+  contact_phone VARCHAR(15) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_emergency_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+  INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: stands
