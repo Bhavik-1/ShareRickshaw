@@ -999,3 +999,404 @@ ul {
         align-items: center;
     }
 }
+
+/* ========================================
+   Safety Features Page Styles
+   ======================================== */
+
+/* Feature 1: Emergency SOS Styles */
+.sos-button {
+    width: 100%;
+    background: #d32f2f;
+    color: white;
+    border: 3px solid #b71c1c;
+    padding: 30px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.sos-button:hover {
+    background: #c62828;
+}
+
+.location-display {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.location-display .label {
+    font-weight: bold;
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.location-display .coords {
+    font-family: 'Courier New', monospace;
+    color: #333;
+    font-size: 14px;
+}
+
+.success-message {
+    background: #e8f5e9;
+    border: 1px solid #4caf50;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    color: #2e7d32;
+    font-size: 14px;
+}
+
+.error-message {
+    background: #ffebee;
+    border: 1px solid #d32f2f;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    color: #c62828;
+    font-size: 14px;
+}
+
+/* Confirmation Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    max-width: 400px;
+    width: 90%;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #333;
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    color: #666;
+    line-height: 1.6;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-buttons button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.modal-buttons .btn-cancel {
+    background: #cccccc;
+    color: #333;
+}
+
+.modal-buttons .btn-cancel:hover {
+    background: #b8b8b8;
+}
+
+.modal-buttons .btn-confirm {
+    background: #d32f2f;
+    color: white;
+}
+
+.modal-buttons .btn-confirm:hover {
+    background: #c62828;
+}
+
+/* Feature 2: Photo Upload Styles */
+.upload-button {
+    width: 100%;
+    background: var(--color-primary);
+    color: white;
+    border: 2px solid #1565c0;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.upload-button:hover {
+    background: #1565c0;
+}
+
+.preview-area {
+    background: white;
+    border: 2px dashed #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 15px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.preview-area.has-image {
+    border-style: solid;
+}
+
+.preview-area img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.preview-placeholder {
+    color: #999;
+    font-size: 14px;
+}
+
+.metadata {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-size: 12px;
+}
+
+.metadata div {
+    margin: 5px 0;
+}
+
+.metadata label {
+    font-weight: bold;
+    color: #666;
+}
+
+.metadata span {
+    color: #333;
+}
+
+/* Feature 3: Trip Sharing Form Styles */
+.contacts-section {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.contacts-section h4 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.contact-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.contact-item input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.contact-item .remove-btn {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.contact-item .remove-btn:hover {
+    background: #c62828;
+}
+
+.add-contact-btn {
+    background: var(--color-teal);
+    color: white;
+    border: 1px solid #00695c;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.add-contact-btn:hover {
+    background: #00695c;
+}
+
+.add-contact-btn:disabled {
+    background: #cccccc;
+    border-color: #999;
+    cursor: not-allowed;
+}
+
+/* Feature 4: Night Mode Toggle Switch Styles */
+.toggle-section {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-row label {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.toggle-switch {
+    width: 60px;
+    height: 30px;
+    background: #cccccc;
+    border-radius: 15px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.toggle-switch .slider {
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: left 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch.active {
+    background: #7b1fa2;
+}
+
+.toggle-switch.active .slider {
+    left: 33px;
+}
+
+.status-message {
+    background: #e8f5e9;
+    border: 1px solid #4caf50;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    color: #2e7d32;
+    font-size: 13px;
+}
+
+.coordinates-display {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.coordinates-display .label {
+    font-weight: bold;
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.coordinates-display .coords {
+    font-family: 'Courier New', monospace;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.coordinates-display .timestamp {
+    font-size: 11px;
+    color: #999;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* ========================================
+   Safety Features Responsive Styles
+   ======================================== */
+
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 90%;
+        padding: 20px;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+    .modal-buttons button {
+        width: 100%;
+    }
+
+    .contact-item {
+        flex-direction: column;
+    }
+
+    .contact-item input {
+        width: 100%;
+    }
+
+    .contact-item .remove-btn {
+        width: 100%;
+    }
+}

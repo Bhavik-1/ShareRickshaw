@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Safety features for share auto travelers - Emergency SOS, auto number capture, trip sharing, and night mode tracking.">
+    <title>Safety Features - Mumbai Share Auto Finder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🛺 Mumbai Share Auto</div>
+
+            <!-- Desktop Navigation -->
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="fare-calculator.html">Fare Calculator</a></li>
+                <li><a href="stands-map.html">Find Stands</a></li>
+                <li><a href="route-finder.html">Route Finder</a></li>
+                <li><a href="safety.html" class="active">Safety</a></li>
+            </ul>
+
+            <!-- Hamburger Menu Icon -->
+            <button class="hamburger" aria-label="Open navigation menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-backdrop"></div>
+    <div class="mobile-menu" aria-hidden="true">
+        <button class="mobile-menu-close" aria-label="Close navigation menu">&times;</button>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="fare-calculator.html">Fare Calculator</a></li>
+            <li><a href="stands-map.html">Find Stands</a></li>
+            <li><a href="route-finder.html">Route Finder</a></li>
+            <li><a href="safety.html" class="active">Safety</a></li>
+        </ul>
+    </div>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1>Safety & Emergency Features</h1>
+        <p class="subtitle">Stay safe while traveling with share autos — use our built-in safety tools.</p>
+    </section>
+
+    <!-- Main Content - Features Grid -->
+    <section class="features-section">
+        <div class="features-container">
+            <div class="features-grid">
+
+                <!-- Feature 1: Emergency SOS -->
+                <div class="feature-card">
+                    <h3>Emergency SOS</h3>
+                    <button class="sos-button" id="sosButton">🚨 SOS EMERGENCY 🚨</button>
+                    <div class="location-display" id="sosLocation">
+                        <div class="label">CURRENT LOCATION:</div>
+                        <div class="coords">Click SOS to fetch location</div>
+                    </div>
+                    <div class="success-message hidden" id="sosSuccess">
+                        ✓ Emergency alert sent! Location shared with contacts.
+                    </div>
+                    <div class="error-message hidden" id="sosError"></div>
+                </div>
+
+                <!-- Feature 2: Auto Number Capture -->
+                <div class="feature-card">
+                    <h3>Auto Number Capture</h3>
+                    <button class="upload-button" id="uploadButton">📷 Upload Auto Number Photo</button>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <div class="preview-area" id="previewArea">
+                        <div class="preview-placeholder">Photo preview will appear here</div>
+                    </div>
+                    <div class="metadata hidden" id="photoMetadata">
+                        <div><label>Captured:</label> <span id="photoTimestamp"></span></div>
+                        <div><label>Location:</label> <span id="photoLocation"></span></div>
+                    </div>
+                    <div class="error-message hidden" id="uploadError"></div>
+                </div>
+
+                <!-- Feature 3: Trip Sharing -->
+                <div class="feature-card">
+                    <h3>Trip Sharing</h3>
+                    <form id="tripSharingForm">
+                        <div class="form-group">
+                            <label for="pickupLocation">Pick-up Location</label>
+                            <input type="text" id="pickupLocation" placeholder="Enter pick-up location">
+                            <div class="error-message" id="pickupError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="destination">Destination</label>
+                            <input type="text" id="destination" placeholder="Enter destination">
+                            <div class="error-message" id="destinationError"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="autoNumber">Auto Number</label>
+                            <input type="text" id="autoNumber" placeholder="e.g., MH 02 AB 1234">
+                            <div class="error-message" id="autoNumberError"></div>
+                        </div>
+                        <div class="contacts-section">
+                            <h4>Emergency Contacts</h4>
+                            <div id="contactsList"></div>
+                            <button type="button" class="add-contact-btn" id="addContactBtn">+ Add Contact</button>
+                        </div>
+                        <button type="submit" class="btn btn-primary full-width">Share Trip Details</button>
+                    </form>
+                </div>
+
+                <!-- Feature 4: Night Mode Safety -->
+                <div class="feature-card">
+                    <h3>Night Mode Safety</h3>
+                    <div class="toggle-section">
+                        <div class="toggle-row">
+                            <label>Enable Night Mode</label>
+                            <div class="toggle-switch" id="nightModeToggle">
+                                <div class="slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-message hidden" id="nightModeStatus">
+                        ✓ Night mode active — location tracking enabled.
+                    </div>
+                    <div class="coordinates-display hidden" id="nightModeCoords">
+                        <div class="label">LIVE LOCATION TRACKING:</div>
+                        <div class="coords" id="nightModeLocation">Lat: 0.0000, Long: 0.0000</div>
+                        <div class="timestamp" id="nightModeTimestamp">Updated: 00:00:00</div>
+                    </div>
+                    <div class="error-message hidden" id="nightModeError"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Confirmation Modal for SOS -->
+    <div class="modal-overlay" id="sosModal">
+        <div class="modal-content">
+            <h3>⚠️ Trigger Emergency Alert?</h3>
+            <p>This will share your location with emergency contacts.</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="modalCancel">Cancel</button>
+                <button class="btn-confirm" id="modalConfirm">Confirm Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <p class="footer-copyright">&copy; 2024 Mumbai Share Auto Finder. All rights reserved.</p>
+                <p class="footer-disclaimer">Fares and routes are indicative. Please verify with drivers.</p>
+            </div>
+            <div class="footer-right">
+                <h3 class="footer-heading">Quick Links</h3>
+                <nav class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="fare-calculator.html">Fare Calculator</a>
+                    <a href="stands-map.html">Find Stands</a>
+                    <a href="route-finder.html">Route Finder</a>
+                    <a href="safety.html">Safety</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
+    <noscript>For the best experience, please enable JavaScript</noscript>
+    <script src="script.js"></script>
+    <script src="safety.js"></script>
+</body>
+</html>
