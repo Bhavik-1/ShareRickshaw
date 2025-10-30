@@ -377,6 +377,7 @@ exports.signupAutowala = async (req, res) => {
           id: userId,
           email: trimmedEmail,
           role: 'autowala',
+          username: trimmedDriverName,
           driver_name: trimmedDriverName,
           phone_number: trimmedPhone,
           operating_location: trimmedLocation,
