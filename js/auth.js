@@ -36,62 +36,71 @@ function updateNavBar() {
 
   if (!navLinks) return; // If nav-links doesn't exist, skip
 
+  // Detect current page
+  const currentPath = window.location.pathname;
+  const currentPage = currentPath.split('/').pop() || 'index.html';
+
+  // Helper function to add active class
+  function isActive(page) {
+    return currentPage === page ? ' class="active"' : '';
+  }
+
   if (isLoggedIn()) {
     const userData = getUserData();
     const username = userData?.username || userData?.driver_name || 'User';
 
     // Create auth navigation items
     const authItems = `
-      <li><a href="profile.html">Profile</a></li>
+      <li><a href="profile.html"${isActive('profile.html')}>Profile</a></li>
       <li><a href="#" onclick="logout(); return false;" style="color: #d32f2f;">Logout</a></li>
     `;
 
     // Add to desktop nav
     navLinks.innerHTML = `
-      <li><a href="index.html">Home</a></li>
-      <li><a href="fare-calculator.html">Fare Calculator</a></li>
-      <li><a href="stands-map.html">Find Stands</a></li>
-      <li><a href="route-finder.html">Route Finder</a></li>
-      <li><a href="safety.html">Safety</a></li>
+      <li><a href="index.html"${isActive('index.html')}>Home</a></li>
+      <li><a href="fare-calculator.html"${isActive('fare-calculator.html')}>Fare Calculator</a></li>
+      <li><a href="stands-map.html"${isActive('stands-map.html')}>Find Stands</a></li>
+      <li><a href="route-finder.html"${isActive('route-finder.html')}>Route Finder</a></li>
+      <li><a href="safety.html"${isActive('safety.html')}>Safety</a></li>
       ${authItems}
     `;
 
     // Add to mobile nav if exists
     if (mobileNavLinks) {
       mobileNavLinks.innerHTML = `
-        <li><a href="index.html">Home</a></li>
-        <li><a href="fare-calculator.html">Fare Calculator</a></li>
-        <li><a href="stands-map.html">Find Stands</a></li>
-        <li><a href="route-finder.html">Route Finder</a></li>
-        <li><a href="safety.html">Safety</a></li>
+        <li><a href="index.html"${isActive('index.html')}>Home</a></li>
+        <li><a href="fare-calculator.html"${isActive('fare-calculator.html')}>Fare Calculator</a></li>
+        <li><a href="stands-map.html"${isActive('stands-map.html')}>Find Stands</a></li>
+        <li><a href="route-finder.html"${isActive('route-finder.html')}>Route Finder</a></li>
+        <li><a href="safety.html"${isActive('safety.html')}>Safety</a></li>
         ${authItems}
       `;
     }
   } else {
     // User not logged in - show login/signup links
     const guestItems = `
-      <li><a href="login.html">Login</a></li>
-      <li><a href="signup.html" style="color: #2196F3; font-weight: 600;">Sign Up</a></li>
+      <li><a href="login.html"${isActive('login.html')}>Login</a></li>
+      <li><a href="signup.html"${isActive('signup.html')} style="color: #2196F3; font-weight: 600;">Sign Up</a></li>
     `;
 
     // Add to desktop nav
     navLinks.innerHTML = `
-      <li><a href="index.html">Home</a></li>
-      <li><a href="fare-calculator.html">Fare Calculator</a></li>
-      <li><a href="stands-map.html">Find Stands</a></li>
-      <li><a href="route-finder.html">Route Finder</a></li>
-      <li><a href="safety.html">Safety</a></li>
+      <li><a href="index.html"${isActive('index.html')}>Home</a></li>
+      <li><a href="fare-calculator.html"${isActive('fare-calculator.html')}>Fare Calculator</a></li>
+      <li><a href="stands-map.html"${isActive('stands-map.html')}>Find Stands</a></li>
+      <li><a href="route-finder.html"${isActive('route-finder.html')}>Route Finder</a></li>
+      <li><a href="safety.html"${isActive('safety.html')}>Safety</a></li>
       ${guestItems}
     `;
 
     // Add to mobile nav if exists
     if (mobileNavLinks) {
       mobileNavLinks.innerHTML = `
-        <li><a href="index.html">Home</a></li>
-        <li><a href="fare-calculator.html">Fare Calculator</a></li>
-        <li><a href="stands-map.html">Find Stands</a></li>
-        <li><a href="route-finder.html">Route Finder</a></li>
-        <li><a href="safety.html">Safety</a></li>
+        <li><a href="index.html"${isActive('index.html')}>Home</a></li>
+        <li><a href="fare-calculator.html"${isActive('fare-calculator.html')}>Fare Calculator</a></li>
+        <li><a href="stands-map.html"${isActive('stands-map.html')}>Find Stands</a></li>
+        <li><a href="route-finder.html"${isActive('route-finder.html')}>Route Finder</a></li>
+        <li><a href="safety.html"${isActive('safety.html')}>Safety</a></li>
         ${guestItems}
       `;
     }
