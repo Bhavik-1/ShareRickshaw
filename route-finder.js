@@ -31,6 +31,11 @@ let destinationError;
 // Page Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in
+    if (!requireAuth()) {
+        return;
+    }
+
     // Get DOM elements
     standSelect = document.getElementById('standSelect');
     destinationInput = document.getElementById('destinationInput');
