@@ -12,6 +12,11 @@ let standsData = [];
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+  // Check if user is logged in
+  if (!requireAuth()) {
+    return;
+  }
+
   initMap();
   fetchStands();
   setupSearch();
