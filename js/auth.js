@@ -1,16 +1,15 @@
 // Auth utility functions for navigation and authentication
 
 // API base URL
-const API_BASE_URL = 'http://localhost:3000/api';
-
+const API_BASE_URL = "http://localhost:3000/api";
 // Get JWT token from localStorage
 function getToken() {
-  return localStorage.getItem('authToken');
+  return localStorage.getItem("authToken");
 }
 
 // Get user data from localStorage
 function getUserData() {
-  const userData = localStorage.getItem('userData');
+  const userData = localStorage.getItem("userData");
   return userData ? JSON.parse(userData) : null;
 }
 
@@ -22,23 +21,23 @@ function isLoggedIn() {
 // Logout function
 function logout() {
   // Clear localStorage
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userData');
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("userData");
 
   // Redirect to home page
-  window.location.href = 'index.html';
+  window.location.href = "index.html";
 }
 
 // Update navigation bar based on auth status
 function updateNavBar() {
-  const navLinks = document.getElementById('nav-links');
-  const mobileNavLinks = document.getElementById('mobile-nav-links');
+  const navLinks = document.getElementById("nav-links");
+  const mobileNavLinks = document.getElementById("mobile-nav-links");
 
   if (!navLinks) return; // If nav-links doesn't exist, skip
 
   if (isLoggedIn()) {
     const userData = getUserData();
-    const username = userData?.username || userData?.driver_name || 'User';
+    const username = userData?.username || userData?.driver_name || "User";
 
     // Create auth navigation items
     const authItems = `
@@ -102,14 +101,14 @@ function updateNavBar() {
 function requireAuth() {
   if (!isLoggedIn()) {
     // Redirect to login page
-    window.location.href = 'login.html';
+    window.location.href = "login.html";
     return false;
   }
   return true;
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   updateNavBar();
 });
 
