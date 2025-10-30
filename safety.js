@@ -1,5 +1,9 @@
 // Safety Features JavaScript
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in
+    if (!requireAuth()) {
+        return;
+    }
 
     // ========================================
     // Global Variables

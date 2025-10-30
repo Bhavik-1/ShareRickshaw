@@ -104,6 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const calculatorForm = document.getElementById('fareCalculatorForm');
 
     if (calculatorForm) {
+        // Check if user is logged in (fare calculator requires authentication)
+        if (!requireAuth()) {
+            return;
+        }
+
         // Fare rate constants (Mumbai government-approved rates)
         const FARE_RATES = {
             baseFare: 26,           // ₹26 for first 1.5 km
