@@ -1,17 +1,26 @@
 // Mumbai Share Auto - Map Page JavaScript
 
-// API Base URL configuration
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:3000/api'
-  : 'https://your-production-api.com/api';
+// API Base URL is now accessed globally from js/auth.js
 
 // Global variables
 let map;
 let markers = {};
 let standsData = [];
 
+// --- FIX: Leaflet default icon path issue (Moved outside DOMContentLoaded) ---
+// This ensures the icon paths are fixed immediately after the Leaflet library loads.
+if (typeof L !== "undefined") {
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl:
+      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  });
+}
+// ------------------------------------------
+
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
   // Check if user is logged in
   if (!requireAuth()) {
     return;
@@ -25,13 +34,13 @@ document.addEventListener('DOMContentLoaded', function() {
 // 1. Initialize Leaflet map
 function initMap() {
   // Create map centered on Mumbai
-  map = L.map('map').setView([19.0760, 72.8777], 12);
+  map = L.map("map").setView([19.076, 72.8777], 12);
 
   // Add OpenStreetMap tile layer
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
     minZoom: 11,
-    attribution: '© OpenStreetMap contributors'
+    attribution: "© OpenStreetMap contributors",
   }).addTo(map);
 }
 
@@ -48,18 +57,18 @@ async function fetchStands() {
       createStandCards(standsData);
       fitMapToMarkers();
     } else {
-      throw new Error('Failed to load stands');
+      throw new Error("Failed to load stands");
     }
   } catch (error) {
     hideLoadingSpinner();
-    showError('Failed to load stands. Please refresh the page.');
-    console.error('Error fetching stands:', error);
+    showError("Failed to load stands. Please refresh the page.");
+    console.error("Error fetching stands:", error);
   }
 }
 
 // 3. Create markers for all stands
 function createMarkers(stands) {
-  stands.forEach(stand => {
+  stands.forEach((stand) => {
     const marker = L.marker([stand.latitude, stand.longitude])
       .bindPopup(createPopupContent(stand))
       .addTo(map);
@@ -68,9 +77,9 @@ function createMarkers(stands) {
     markers[stand.id] = marker;
 
     // Click handler: zoom to marker
-    marker.on('click', function() {
+    marker.on("click", function () {
       map.flyTo([stand.latitude, stand.longitude], 15, {
-        duration: 0.5
+        duration: 0.5,
       });
     });
   });
@@ -82,13 +91,17 @@ function createPopupContent(stand) {
   const displayRoutes = stand.routes.slice(0, maxRoutes);
   const remainingCount = stand.routes.length - maxRoutes;
 
-  let routesList = displayRoutes.map(route =>
-    `<li>${route.destination} → ₹${route.fare} | ${route.travel_time}</li>`
-  ).join('');
+  let routesList = displayRoutes
+    .map(
+      (route) =>
+        `<li>${route.destination} → ₹${route.fare} | ${route.travel_time}</li>`
+    )
+    .join("");
 
-  let moreText = remainingCount > 0
-    ? `<p class="popup-more-routes">+ ${remainingCount} more routes</p>`
-    : '';
+  let moreText =
+    remainingCount > 0
+      ? `<p class="popup-more-routes">+ ${remainingCount} more routes</p>`
+      : "";
 
   return `
     <div class="stand-popup">
@@ -105,12 +118,12 @@ function createPopupContent(stand) {
 
 // 5. Create stand cards in list section
 function createStandCards(stands) {
-  const grid = document.getElementById('stands-grid');
-  grid.innerHTML = '';
+  const grid = document.getElementById("stands-grid");
+  grid.innerHTML = "";
 
-  stands.forEach(stand => {
-    const card = document.createElement('div');
-    card.className = 'stand-card';
+  stands.forEach((stand) => {
+    const card = document.createElement("div");
+    card.className = "stand-card";
     card.dataset.standId = stand.id;
 
     card.innerHTML = `
@@ -121,13 +134,13 @@ function createStandCards(stands) {
     `;
 
     // Card click handler
-    card.addEventListener('click', function() {
+    card.addEventListener("click", function () {
       focusMarker(stand.id);
     });
 
     // Button click handler (same as card)
-    const button = card.querySelector('.btn-view-map');
-    button.addEventListener('click', function(e) {
+    const button = card.querySelector(".btn-view-map");
+    button.addEventListener("click", function (e) {
       e.stopPropagation();
       focusMarker(stand.id);
     });
@@ -139,14 +152,14 @@ function createStandCards(stands) {
 // 6. Focus marker on map (from card click)
 function focusMarker(standId) {
   // Scroll to map
-  document.getElementById('map').scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
+  document.getElementById("map").scrollIntoView({
+    behavior: "smooth",
+    block: "start",
   });
 
   // Trigger marker click after scroll
   setTimeout(() => {
-    markers[standId].fire('click');
+    markers[standId].fire("click");
   }, 500);
 }
 
@@ -160,10 +173,10 @@ function fitMapToMarkers() {
 
 // 8. Setup search functionality
 function setupSearch() {
-  const searchInput = document.getElementById('search-input');
+  const searchInput = document.getElementById("search-input");
   let debounceTimer;
 
-  searchInput.addEventListener('input', function() {
+  searchInput.addEventListener("input", function () {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       performSearch(searchInput.value);
@@ -174,25 +187,25 @@ function setupSearch() {
 // 9. Perform search filtering
 function performSearch(searchTerm) {
   const term = searchTerm.toLowerCase().trim();
-  const heading = document.getElementById('stands-heading');
-  const noResults = document.getElementById('no-results');
-  const grid = document.getElementById('stands-grid');
+  const heading = document.getElementById("stands-heading");
+  const noResults = document.getElementById("no-results");
+  const grid = document.getElementById("stands-grid");
 
-  if (term === '') {
+  if (term === "") {
     // Show all
     showAllStands();
-    heading.textContent = 'All Stands';
-    noResults.style.display = 'none';
-    grid.style.display = 'grid';
+    heading.textContent = "All Stands";
+    noResults.style.display = "none";
+    grid.style.display = "grid";
     return;
   }
 
   let matchCount = 0;
 
-  standsData.forEach(stand => {
+  standsData.forEach((stand) => {
     // Check if stand name or any route matches
     const nameMatch = stand.name.toLowerCase().includes(term);
-    const routeMatch = stand.routes.some(route =>
+    const routeMatch = stand.routes.some((route) =>
       route.destination.toLowerCase().includes(term)
     );
 
@@ -205,14 +218,18 @@ function performSearch(searchTerm) {
         markers[stand.id].addTo(map);
       }
       // Show card
-      const card = document.querySelector(`.stand-card[data-stand-id="${stand.id}"]`);
-      if (card) card.style.display = 'block';
+      const card = document.querySelector(
+        `.stand-card[data-stand-id="${stand.id}"]`
+      );
+      if (card) card.style.display = "block";
     } else {
       // Hide marker
       map.removeLayer(markers[stand.id]);
       // Hide card
-      const card = document.querySelector(`.stand-card[data-stand-id="${stand.id}"]`);
-      if (card) card.style.display = 'none';
+      const card = document.querySelector(
+        `.stand-card[data-stand-id="${stand.id}"]`
+      );
+      if (card) card.style.display = "none";
     }
   });
 
@@ -221,11 +238,11 @@ function performSearch(searchTerm) {
 
   // Show/hide no results message
   if (matchCount === 0) {
-    noResults.style.display = 'block';
-    grid.style.display = 'none';
+    noResults.style.display = "block";
+    grid.style.display = "none";
   } else {
-    noResults.style.display = 'none';
-    grid.style.display = 'grid';
+    noResults.style.display = "none";
+    grid.style.display = "grid";
 
     // Fit map to visible markers
     const visibleMarkers = Object.entries(markers)
@@ -241,14 +258,16 @@ function performSearch(searchTerm) {
 
 // 10. Show all stands (clear search)
 function showAllStands() {
-  standsData.forEach(stand => {
+  standsData.forEach((stand) => {
     // Show all markers
     if (!map.hasLayer(markers[stand.id])) {
       markers[stand.id].addTo(map);
     }
     // Show all cards
-    const card = document.querySelector(`.stand-card[data-stand-id="${stand.id}"]`);
-    if (card) card.style.display = 'block';
+    const card = document.querySelector(
+      `.stand-card[data-stand-id="${stand.id}"]`
+    );
+    if (card) card.style.display = "block";
   });
 
   fitMapToMarkers();
@@ -256,13 +275,13 @@ function showAllStands() {
 
 // 11. Hide loading spinner
 function hideLoadingSpinner() {
-  const spinner = document.getElementById('loading-spinner');
-  if (spinner) spinner.style.display = 'none';
+  const spinner = document.getElementById("loading-spinner");
+  if (spinner) spinner.style.display = "none";
 }
 
 // 12. Show error message
 function showError(message) {
-  const mapDiv = document.getElementById('map');
+  const mapDiv = document.getElementById("map");
   mapDiv.innerHTML = `
     <div style="display: flex; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center;">
       <p style="font-size: 18px; color: #d32f2f;">${message}</p>
