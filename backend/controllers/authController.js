@@ -1,7 +1,7 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const db = require('../config/database');
-require('dotenv').config();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const db = require("../config/database");
+require("dotenv").config();
 
 // POST /api/auth/login
 // Purpose: Admin login to get JWT token
@@ -13,27 +13,27 @@ exports.login = async (req, res) => {
     if (!username || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Username and password required'
+        message: "Username and password required",
       });
     }
 
-    if (username.trim() === '' || password.length < 6) {
+    if (username.trim() === "" || password.length < 6) {
       return res.status(400).json({
         success: false,
-        message: 'Username and password required'
+        message: "Username and password required",
       });
     }
 
     // Query user from database
     const [users] = await db.query(
-      'SELECT id, username, password_hash, email FROM users WHERE username = ?',
+      "SELECT id, username, password_hash, email FROM users WHERE username = ?",
       [username.trim()]
     );
 
     if (users.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: "Invalid credentials",
       });
     }
 
@@ -45,7 +45,7 @@ exports.login = async (req, res) => {
     if (!isValidPassword) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials'
+        message: "Invalid credentials",
       });
     }
 
@@ -53,11 +53,11 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user.id,
-        username: user.username
+        username: user.username,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+        expiresIn: process.env.JWT_EXPIRES_IN || "7d",
       }
     );
 
@@ -68,15 +68,14 @@ exports.login = async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
-
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: "Server error",
     });
   }
 };
@@ -91,15 +90,14 @@ exports.verify = async (req, res) => {
       success: true,
       user: {
         id: req.user.id,
-        username: req.user.username
-      }
+        username: req.user.username,
+      },
     });
-
   } catch (error) {
-    console.error('Verify error:', error);
+    console.error("Verify error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: "Server error",
     });
   }
 };
@@ -114,7 +112,7 @@ exports.signup = async (req, res) => {
     if (!username || !email || !phone_number || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: 'All fields are required'
+        message: "All fields are required",
       });
     }
 
@@ -128,7 +126,8 @@ exports.signup = async (req, res) => {
     if (!usernameRegex.test(trimmedUsername)) {
       return res.status(400).json({
         success: false,
-        message: 'Username must be 3-50 characters (letters, numbers, underscores)'
+        message:
+          "Username must be 3-50 characters (letters, numbers, underscores)",
       });
     }
 
@@ -137,7 +136,7 @@ exports.signup = async (req, res) => {
     if (!emailRegex.test(trimmedEmail)) {
       return res.status(400).json({
         success: false,
-        message: 'Please enter a valid email address'
+        message: "Please enter a valid email address",
       });
     }
 
@@ -146,7 +145,7 @@ exports.signup = async (req, res) => {
     if (!phoneRegex.test(trimmedPhone)) {
       return res.status(400).json({
         success: false,
-        message: 'Phone number must be exactly 10 digits'
+        message: "Phone number must be exactly 10 digits",
       });
     }
 
@@ -154,33 +153,33 @@ exports.signup = async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters'
+        message: "Password must be at least 6 characters",
       });
     }
 
     // Check if email already exists (case-insensitive)
     const [existingEmail] = await db.query(
-      'SELECT id FROM users WHERE LOWER(email) = LOWER(?)',
+      "SELECT id FROM users WHERE LOWER(email) = LOWER(?)",
       [trimmedEmail]
     );
 
     if (existingEmail.length > 0) {
       return res.status(409).json({
         success: false,
-        message: 'This email is already registered'
+        message: "This email is already registered",
       });
     }
 
     // Check if username already exists (case-insensitive)
     const [existingUsername] = await db.query(
-      'SELECT id FROM users WHERE LOWER(username) = LOWER(?)',
+      "SELECT id FROM users WHERE LOWER(username) = LOWER(?)",
       [trimmedUsername]
     );
 
     if (existingUsername.length > 0) {
       return res.status(409).json({
         success: false,
-        message: 'This username is already taken'
+        message: "This username is already taken",
       });
     }
 
@@ -190,8 +189,8 @@ exports.signup = async (req, res) => {
 
     // Insert into users table
     const [result] = await db.query(
-      'INSERT INTO users (username, email, phone_number, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
-      [trimmedUsername, trimmedEmail, trimmedPhone, passwordHash, 'user']
+      "INSERT INTO users (username, email, phone_number, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
+      [trimmedUsername, trimmedEmail, trimmedPhone, passwordHash, "user"]
     );
 
     const userId = result.insertId;
@@ -201,11 +200,11 @@ exports.signup = async (req, res) => {
       {
         id: userId,
         username: trimmedUsername,
-        role: 'user'
+        role: "user",
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+        expiresIn: process.env.JWT_EXPIRES_IN || "7d",
       }
     );
 
@@ -218,15 +217,14 @@ exports.signup = async (req, res) => {
         username: trimmedUsername,
         email: trimmedEmail,
         phone_number: trimmedPhone,
-        role: 'user'
-      }
+        role: "user",
+      },
     });
-
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error("Signup error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: "Server error",
     });
   }
 };
@@ -235,13 +233,29 @@ exports.signup = async (req, res) => {
 // Purpose: Register new autowala account with driver and auto details
 exports.signupAutowala = async (req, res) => {
   try {
-    const { email, password, driver_name, phone_number, operating_location, license_plate, role } = req.body;
+    const {
+      email,
+      password,
+      driver_name,
+      phone_number,
+      operating_location,
+      license_plate,
+      role,
+    } = req.body;
 
     // Validate all required fields present
-    if (!email || !password || !driver_name || !phone_number || !operating_location || !license_plate || !role) {
+    if (
+      !email ||
+      !password ||
+      !driver_name ||
+      !phone_number ||
+      !operating_location ||
+      !license_plate ||
+      !role
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'All fields are required'
+        message: "All fields are required",
       });
     }
 
@@ -257,7 +271,7 @@ exports.signupAutowala = async (req, res) => {
     if (!emailRegex.test(trimmedEmail)) {
       return res.status(400).json({
         success: false,
-        message: 'Please enter a valid email address'
+        message: "Please enter a valid email address",
       });
     }
 
@@ -265,7 +279,7 @@ exports.signupAutowala = async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters'
+        message: "Password must be at least 6 characters",
       });
     }
 
@@ -273,7 +287,7 @@ exports.signupAutowala = async (req, res) => {
     if (trimmedDriverName.length < 2 || trimmedDriverName.length > 100) {
       return res.status(400).json({
         success: false,
-        message: 'Driver name must be 2-100 characters'
+        message: "Driver name must be 2-100 characters",
       });
     }
 
@@ -282,7 +296,7 @@ exports.signupAutowala = async (req, res) => {
     if (!phoneRegex.test(trimmedPhone)) {
       return res.status(400).json({
         success: false,
-        message: 'Phone number must be exactly 10 digits'
+        message: "Phone number must be exactly 10 digits",
       });
     }
 
@@ -290,7 +304,7 @@ exports.signupAutowala = async (req, res) => {
     if (trimmedLocation.length < 2 || trimmedLocation.length > 100) {
       return res.status(400).json({
         success: false,
-        message: 'Operating location must be 2-100 characters'
+        message: "Operating location must be 2-100 characters",
       });
     }
 
@@ -299,34 +313,55 @@ exports.signupAutowala = async (req, res) => {
     if (!licensePlateRegex.test(trimmedLicensePlate)) {
       return res.status(400).json({
         success: false,
-        message: 'License plate must be 5-20 alphanumeric characters'
+        message: "License plate must be 5-20 alphanumeric characters",
       });
     }
 
     // Check if email already exists
     const [existingEmail] = await db.query(
-      'SELECT id FROM users WHERE LOWER(email) = LOWER(?)',
+      "SELECT id FROM users WHERE LOWER(email) = LOWER(?)",
       [trimmedEmail]
     );
 
     if (existingEmail.length > 0) {
       return res.status(409).json({
         success: false,
-        message: 'This email is already registered'
+        message: "This email is already registered",
       });
     }
 
     // Check if license plate already exists
     const [existingLicense] = await db.query(
-      'SELECT id FROM autowala_details WHERE license_plate = ?',
+      "SELECT id FROM autowala_details WHERE license_plate = ?",
       [trimmedLicensePlate]
     );
 
     if (existingLicense.length > 0) {
       return res.status(409).json({
         success: false,
-        message: 'This license plate is already registered'
+        message: "This license plate is already registered",
       });
+    }
+
+    // FIX: Generate a unique username from driver name and license plate to satisfy the NOT NULL constraint in the users table.
+    // 1. Clean driver name: lowercase, remove non-alphanumeric (except spaces), replace spaces with underscore.
+    const cleanedDriverName = trimmedDriverName
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, "")
+      .replace(/\s+/g, "_");
+
+    // 2. Combine with the unique license plate. The combination guarantees a unique username.
+    let generatedUsername = `${cleanedDriverName}_${trimmedLicensePlate}`;
+
+    // 3. Ensure it doesn't exceed 50 characters (VARCHAR(50) limit). Truncate the driver name part if necessary.
+    if (generatedUsername.length > 50) {
+      const licenseLength = trimmedLicensePlate.length;
+      const maxDriverNameLength = 50 - licenseLength - 1; // 1 for the underscore separator
+      const truncatedDriverName = cleanedDriverName.substring(
+        0,
+        maxDriverNameLength
+      );
+      generatedUsername = `${truncatedDriverName}_${trimmedLicensePlate}`;
     }
 
     // Hash password
@@ -338,18 +373,24 @@ exports.signupAutowala = async (req, res) => {
     await connection.beginTransaction();
 
     try {
-      // Insert into users table
+      // Insert into users table - FIX: Added 'username' column and 'generatedUsername' value
       const [userResult] = await connection.query(
-        'INSERT INTO users (email, password_hash, role, created_at) VALUES (?, ?, ?, NOW())',
-        [trimmedEmail, passwordHash, 'autowala']
+        "INSERT INTO users (username, email, password_hash, role, created_at) VALUES (?, ?, ?, ?, NOW())",
+        [generatedUsername, trimmedEmail, passwordHash, "autowala"]
       );
 
       const userId = userResult.insertId;
 
       // Insert into autowala_details table
       await connection.query(
-        'INSERT INTO autowala_details (user_id, license_plate, driver_name, operating_location, driver_phone, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
-        [userId, trimmedLicensePlate, trimmedDriverName, trimmedLocation, trimmedPhone]
+        "INSERT INTO autowala_details (user_id, license_plate, driver_name, operating_location, driver_phone, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
+        [
+          userId,
+          trimmedLicensePlate,
+          trimmedDriverName,
+          trimmedLocation,
+          trimmedPhone,
+        ]
       );
 
       // Commit transaction
@@ -361,11 +402,11 @@ exports.signupAutowala = async (req, res) => {
         {
           id: userId,
           email: trimmedEmail,
-          role: 'autowala'
+          role: "autowala",
         },
         process.env.JWT_SECRET,
         {
-          expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+          expiresIn: process.env.JWT_EXPIRES_IN || "7d",
         }
       );
 
@@ -376,27 +417,24 @@ exports.signupAutowala = async (req, res) => {
         user: {
           id: userId,
           email: trimmedEmail,
-          role: 'autowala',
-          username: trimmedDriverName,
+          role: "autowala",
           driver_name: trimmedDriverName,
           phone_number: trimmedPhone,
           operating_location: trimmedLocation,
-          license_plate: trimmedLicensePlate
-        }
+          license_plate: trimmedLicensePlate,
+        },
       });
-
     } catch (transactionError) {
       // Rollback transaction on error
       await connection.rollback();
       connection.release();
       throw transactionError;
     }
-
   } catch (error) {
-    console.error('Autowala signup error:', error);
+    console.error("Autowala signup error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: "Server error",
     });
   }
 };
@@ -411,7 +449,7 @@ exports.loginUser = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Email and password are required'
+        message: "Email and password are required",
       });
     }
 
@@ -420,14 +458,14 @@ exports.loginUser = async (req, res) => {
 
     // Query user from database (only user or autowala roles)
     const [users] = await db.query(
-      'SELECT id, username, email, phone_number, role, password_hash FROM users WHERE LOWER(email) = ? AND role IN (?, ?)',
-      [trimmedEmail, 'user', 'autowala']
+      "SELECT id, username, email, phone_number, role, password_hash FROM users WHERE LOWER(email) = ? AND role IN (?, ?)",
+      [trimmedEmail, "user", "autowala"]
     );
 
     if (users.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: "Invalid email or password",
       });
     }
 
@@ -439,14 +477,14 @@ exports.loginUser = async (req, res) => {
     if (!isValidPassword) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: "Invalid email or password",
       });
     }
 
     // If autowala, fetch autowala_details
-    if (user.role === 'autowala') {
+    if (user.role === "autowala") {
       const [autowalaDetails] = await db.query(
-        'SELECT driver_name, driver_phone, operating_location, license_plate FROM autowala_details WHERE user_id = ?',
+        "SELECT driver_name, driver_phone, operating_location, license_plate FROM autowala_details WHERE user_id = ?",
         [user.id]
       );
 
@@ -457,11 +495,11 @@ exports.loginUser = async (req, res) => {
         {
           id: user.id,
           email: user.email,
-          role: user.role
+          role: user.role,
         },
         process.env.JWT_SECRET,
         {
-          expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+          expiresIn: process.env.JWT_EXPIRES_IN || "7d",
         }
       );
 
@@ -472,12 +510,11 @@ exports.loginUser = async (req, res) => {
           id: user.id,
           email: user.email,
           role: user.role,
-          username: autowala.driver_name,
           driver_name: autowala.driver_name,
           phone_number: autowala.driver_phone,
           operating_location: autowala.operating_location,
-          license_plate: autowala.license_plate
-        }
+          license_plate: autowala.license_plate,
+        },
       });
     }
 
@@ -487,11 +524,11 @@ exports.loginUser = async (req, res) => {
       {
         id: user.id,
         username: user.username,
-        role: user.role
+        role: user.role,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+        expiresIn: process.env.JWT_EXPIRES_IN || "7d",
       }
     );
 
@@ -503,15 +540,14 @@ exports.loginUser = async (req, res) => {
         username: user.username,
         email: user.email,
         phone_number: user.phone_number,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
-
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: "Server error",
     });
   }
 };
