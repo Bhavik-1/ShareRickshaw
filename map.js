@@ -1,9 +1,7 @@
 // Mumbai Share Auto - Map Page JavaScript
 
-// API Base URL configuration
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:3000/api'
-  : 'https://your-production-api.com/api';
+// API Base URL is provided by auth.js (loaded before this script)
+// Access via window.API_BASE_URL
 
 // Global variables
 let map;
