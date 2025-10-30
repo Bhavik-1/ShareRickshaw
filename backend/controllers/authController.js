@@ -472,6 +472,7 @@ exports.loginUser = async (req, res) => {
           id: user.id,
           email: user.email,
           role: user.role,
+          username: autowala.driver_name,
           driver_name: autowala.driver_name,
           phone_number: autowala.driver_phone,
           operating_location: autowala.operating_location,
