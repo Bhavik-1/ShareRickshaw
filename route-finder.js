@@ -8,10 +8,8 @@ let standsData = []; // Stores all stands with routes from API
 let recentSearches = []; // Array of recent search objects (max 3)
 const MAX_RECENT_SEARCHES = 3;
 
-// API Configuration
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3000'
-    : '';
+// API Configuration - provided by auth.js (loaded before this script)
+// Access via window.API_BASE_URL
 
 // DOM Elements
 let standSelect;
@@ -79,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Fetch Stands Data
 // ============================================
 function fetchStands() {
-    fetch(`${API_BASE_URL}/api/stands`)
+    fetch(`${API_BASE_URL}/stands`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to fetch stands');
