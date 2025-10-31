@@ -78,11 +78,11 @@ app.use('/api/stands', standsRoutes);
 app.use('/api/routes', routesRoutes);
 app.use('/api/bookings', bookingsRoutes);
 
-// Driver status routes (same file as bookings, separate paths)
-const driverStatusRoutes = express.Router();
-driverStatusRoutes.post('/update', require('./middleware/auth'), require('./controllers/bookingsController').updateDriverStatus);
-driverStatusRoutes.post('/location', require('./middleware/auth'), require('./controllers/bookingsController').updateDriverLocation);
-app.use('/api/driver-status', driverStatusRoutes);
+// Driver status routes
+const bookingsCtrl = require('./controllers/bookingsController');
+const authMiddleware = require('./middleware/auth');
+app.post('/api/driver-status/update', authMiddleware, bookingsCtrl.updateDriverStatus);
+app.post('/api/driver-status/location', authMiddleware, bookingsCtrl.updateDriverLocation);
 
 // Root endpoint
 app.get('/', (req, res) => {
