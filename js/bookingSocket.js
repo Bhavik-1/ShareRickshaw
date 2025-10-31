@@ -154,6 +154,9 @@ function onDriverLocationUpdate(data) {
   // Update map with new driver location
   updateDriverLocationOnMap(data.latitude, data.longitude);
 
+  // Calculate distance from user to driver
+  calculateAndDisplayDistance(data.latitude, data.longitude);
+
   // Update ETA if possible
   updateETA(data);
 }
