@@ -34,12 +34,19 @@ document.addEventListener('DOMContentLoaded', () => {
   requireAuth();
 
   // Check if user is autowala (driver)
-  const userRole = localStorage.getItem('userRole');
-  if (userRole !== 'autowala') {
+  const userData = getUserData();
+
+  console.log('User Data:', userData);
+  console.log('User Role:', userData?.role);
+
+  // Check if role is autowala
+  if (!userData || userData.role !== 'autowala') {
+    console.warn('Access denied - User role:', userData?.role);
     showAccessDenied();
     return;
   }
 
+  console.log('Access granted for autowala');
   loadDriverInfo();
   initializeSocket();
   setupEventListeners();
