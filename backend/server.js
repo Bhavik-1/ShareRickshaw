@@ -17,7 +17,11 @@ const bookingsRoutes = require('./routes/bookings');
 
 // Import middleware and services
 const socketAuth = require('./middleware/socketAuth');
-const { setIoInstance } = require('./services/socketEmitter');
+const {
+  setIoInstance,
+  registerUserSocket,
+  unregisterUserSocket
+} = require('./services/socketEmitter');
 
 // Initialize Express app
 const app = express();
