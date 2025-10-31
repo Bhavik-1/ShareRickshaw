@@ -6,6 +6,13 @@
 let socket = null;
 let currentBookingId = null;
 
+// Get current booking ID from localStorage on page load
+function loadCurrentBookingId() {
+  currentBookingId = localStorage.getItem('currentBookingId');
+  console.log('Loaded current booking ID from localStorage:', currentBookingId);
+  return currentBookingId;
+}
+
 /**
  * Initialize WebSocket connection
  */
