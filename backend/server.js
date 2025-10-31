@@ -22,6 +22,20 @@ const { setIoInstance } = require('./services/socketEmitter');
 // Initialize Express app
 const app = express();
 
+// Create HTTP server for socket.io
+const server = http.createServer(app);
+
+// Initialize socket.io
+const io = socketIo(server, {
+  cors: {
+    origin: ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost:5500'],
+    credentials: true
+  }
+});
+
+// Set io instance in socketEmitter service
+setIoInstance(io);
+
 // Middleware
 app.use(cors({
   origin: ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost:5500'],
@@ -36,11 +50,26 @@ app.use((req, res, next) => {
   next();
 });
 
+// WebSocket connection handling
+io.use(socketAuth);
+
+io.on('connection', (socket) => {
+  const userId = socket.userId;
+  const userRole = socket.userRole;
+  console.log(`User ${userId} (${userRole}) connected via WebSocket`);
+
+  socket.on('disconnect', () => {
+    console.log(`User ${userId} disconnected from WebSocket`);
+  });
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/stands', standsRoutes);
 app.use('/api/routes', routesRoutes);
+app.use('/api/bookings', bookingsRoutes);
+app.use('/api/driver-status', require('./routes/bookings')); // Reuse bookings route file for driver status
 
 // Root endpoint
 app.get('/', (req, res) => {
