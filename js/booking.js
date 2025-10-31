@@ -66,12 +66,21 @@ function handleUseMyLocation(e) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        pickupLatInput.value = latitude;
-        pickupLngInput.value = longitude;
+
+        console.log(`Got geolocation: ${latitude}, ${longitude}`);
+
+        pickupLatInput.value = latitude.toFixed(8);
+        pickupLngInput.value = longitude.toFixed(8);
 
         // Use reverse geocoding to get address (simplified)
         pickupAddressInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-        calculateFare();
+
+        console.log(`Set pickup coords - Lat: ${pickupLatInput.value}, Lng: ${pickupLngInput.value}`);
+
+        // Trigger fare calculation if destination is also set
+        setTimeout(() => {
+          calculateFare();
+        }, 100);
       },
       (error) => {
         console.error('Geolocation error:', error);
