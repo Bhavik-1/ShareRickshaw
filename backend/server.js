@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const http = require('http');
+const socketIo = require('socket.io');
 require('dotenv').config();
 
 // Import database connection (establishes connection on load)
@@ -11,6 +13,11 @@ const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const standsRoutes = require('./routes/stands');
 const routesRoutes = require('./routes/routes');
+const bookingsRoutes = require('./routes/bookings');
+
+// Import middleware and services
+const socketAuth = require('./middleware/socketAuth');
+const { setIoInstance } = require('./services/socketEmitter');
 
 // Initialize Express app
 const app = express();
