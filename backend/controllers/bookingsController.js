@@ -273,11 +273,11 @@ exports.acceptBooking = async (req, res) => {
       });
     }
 
-    // Update booking status
+    // Update booking status and assign driver
     const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
     await db.query(
-      `UPDATE bookings SET status = 'accepted', accepted_at = ? WHERE id = ?`,
-      [now, id]
+      `UPDATE bookings SET status = 'accepted', accepted_at = ?, driver_id = ? WHERE id = ?`,
+      [now, driverId, id]
     );
 
     // Get driver details
