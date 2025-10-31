@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const http = require('http');
+const socketIo = require('socket.io');
 require('dotenv').config();
 
 // Import database connection (establishes connection on load)
@@ -11,9 +13,32 @@ const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const standsRoutes = require('./routes/stands');
 const routesRoutes = require('./routes/routes');
+const bookingsRoutes = require('./routes/bookings');
+
+// Import middleware and services
+const socketAuth = require('./middleware/socketAuth');
+const {
+  setIoInstance,
+  registerUserSocket,
+  unregisterUserSocket
+} = require('./services/socketEmitter');
 
 // Initialize Express app
 const app = express();
+
+// Create HTTP server for socket.io
+const server = http.createServer(app);
+
+// Initialize socket.io
+const io = socketIo(server, {
+  cors: {
+    origin: ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost:5500'],
+    credentials: true
+  }
+});
+
+// Set io instance in socketEmitter service
+setIoInstance(io);
 
 // Middleware
 app.use(cors({
@@ -29,11 +54,35 @@ app.use((req, res, next) => {
   next();
 });
 
+// WebSocket connection handling
+io.use(socketAuth);
+
+io.on('connection', (socket) => {
+  const userId = socket.userId;
+  const userRole = socket.userRole;
+  console.log(`User ${userId} (${userRole}) connected via WebSocket`);
+
+  // Register user socket
+  registerUserSocket(userId, socket);
+
+  socket.on('disconnect', () => {
+    console.log(`User ${userId} disconnected from WebSocket`);
+    unregisterUserSocket(userId, socket.id);
+  });
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/stands', standsRoutes);
 app.use('/api/routes', routesRoutes);
+app.use('/api/bookings', bookingsRoutes);
+
+// Driver status routes
+const bookingsCtrl = require('./controllers/bookingsController');
+const authMiddleware = require('./middleware/auth');
+app.post('/api/driver-status/update', authMiddleware, bookingsCtrl.updateDriverStatus);
+app.post('/api/driver-status/location', authMiddleware, bookingsCtrl.updateDriverLocation);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -44,7 +93,9 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       profile: '/api/profile',
       stands: '/api/stands',
-      routes: '/api/routes'
+      routes: '/api/routes',
+      bookings: '/api/bookings',
+      driverStatus: '/api/driver-status'
     }
   });
 });
@@ -68,7 +119,8 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`API available at http://localhost:${PORT}/api`);
+  console.log(`WebSocket available on same port ${PORT}`);
 });
