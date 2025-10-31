@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Dashboard - Mumbai Share Auto</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/driver-dashboard.css">
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">ShareRickshaw</a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="driver-dashboard.html" class="nav-link active">Driver Dashboard</a></li>
+        <li><a href="#" id="logoutBtn" class="nav-link">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="dashboard-container">
+    <!-- Status Bar -->
+    <section class="status-bar">
+      <div class="driver-info">
+        <div class="driver-name" id="driverName">Driver Name</div>
+        <div class="license-plate" id="licensePlate">License Plate</div>
+      </div>
+
+      <div class="status-toggle">
+        <label for="onlineToggle" class="toggle-label">Status:</label>
+        <button id="onlineToggle" class="status-btn offline">
+          <span class="status-indicator"></span>
+          <span class="status-text">Offline</span>
+        </button>
+      </div>
+
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">Today's Trips:</span>
+          <span class="stat-value" id="todaysTrips">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Earnings:</span>
+          <span class="stat-value" id="todaysEarnings">₹0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Section 1: Active Bookings -->
+      <section class="dashboard-section active-bookings">
+        <h2>Active Booking</h2>
+        <div id="activeBookingContainer" class="booking-container">
+          <div class="empty-state">
+            <div class="empty-icon">🚕</div>
+            <p>No active booking</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Incoming Booking Requests -->
+      <section class="dashboard-section booking-requests">
+        <h2>Incoming Requests</h2>
+        <div id="bookingRequestsContainer" class="requests-container">
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <p>Waiting for booking requests...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Trip Details & Chat -->
+      <section class="dashboard-section trip-details">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="trip">Trip Details</button>
+          <button class="tab-btn" data-tab="chat">Chat</button>
+          <button class="tab-btn" data-tab="location">Location</button>
+        </div>
+
+        <!-- Trip Details Tab -->
+        <div id="tripTab" class="tab-content active">
+          <div class="trip-info">
+            <div class="trip-item">
+              <span class="trip-label">Pickup:</span>
+              <span id="tripPickup" class="trip-value">-</span>
+            </div>
+            <div class="trip-item">
+              <span class="trip-label">Destination:</span>
+              <span id="tripDestination" class="trip-value">-</span>
+            </div>
+            <div class="trip-item">
+              <span class="trip-label">Fare:</span>
+              <span id="tripFare" class="trip-value">₹0</span>
+            </div>
+            <div class="trip-item">
+              <span class="trip-label">Status:</span>
+              <span id="tripStatus" class="trip-value">-</span>
+            </div>
+            <div class="trip-actions">
+              <button id="startTripBtn" class="btn btn-success hidden">Start Trip</button>
+              <button id="completeTripBtn" class="btn btn-success hidden">Complete Trip</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Tab -->
+        <div id="chatTab" class="tab-content">
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Send a message..." maxlength="500">
+            <button id="sendChatBtn" class="btn btn-small">Send</button>
+          </div>
+        </div>
+
+        <!-- Location Tab -->
+        <div id="locationTab" class="tab-content">
+          <div class="location-controls">
+            <div class="location-display">
+              <div id="currentLocation">Location: Not set</div>
+            </div>
+            <button id="updateLocationBtn" class="btn btn-primary">📍 Update Location</button>
+            <div id="locationStatus" class="location-status"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/auth.js"></script>
+  <script src="js/driver-dashboard.js"></script>
+</body>
+</html>
