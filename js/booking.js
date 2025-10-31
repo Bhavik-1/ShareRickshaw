@@ -604,13 +604,30 @@ function handleNewRide() {
  * Show active booking section with map
  */
 function showActiveBooking(driverData) {
+  console.log('Showing active booking section with driver data:', driverData);
+
+  // Hide all sections
+  bookingFormSection.classList.remove('active');
+  bookingFormSection.classList.add('hidden');
+
   bookingStatusSection.classList.remove('active');
+  bookingStatusSection.classList.add('hidden');
+
+  activeBookingSection.classList.remove('hidden');
   activeBookingSection.classList.add('active');
+
+  tripCompletedSection.classList.remove('active');
+  tripCompletedSection.classList.add('hidden');
 
   // Update driver info
   if (driverData) {
-    document.getElementById('driverName').textContent = driverData.driver_name || 'Driver';
-    document.getElementById('licenseePlate').textContent = driverData.license_plate || 'N/A';
+    const driverNameEl = document.getElementById('driverName');
+    const licensePlateEl = document.getElementById('licenseePlate');
+
+    if (driverNameEl) driverNameEl.textContent = driverData.driver_name || 'Driver';
+    if (licensePlateEl) licensePlateEl.textContent = driverData.license_plate || 'N/A';
+
+    console.log('Updated driver info:', driverData.driver_name, driverData.license_plate);
   }
 
   // Initialize map (simplified)
