@@ -403,6 +403,101 @@ function clearErrors() {
 }
 
 /**
+ * Show booking confirmation dialog
+ */
+function showBookingConfirmation(bookingData) {
+  // Create confirmation overlay
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  `;
+
+  const confirmDialog = document.createElement('div');
+  confirmDialog.style.cssText = `
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    animation: slideUp 0.3s ease;
+  `;
+
+  const fare = bookingData.estimated_fare || 0;
+
+  confirmDialog.innerHTML = `
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">✅</div>
+      <h2 style="margin: 0; color: #2C3E50;">Booking Confirmed!</h2>
+      <p style="color: #666; margin: 0.5rem 0 0 0;">Booking ID: <strong>#${bookingData.booking_id}</strong></p>
+    </div>
+
+    <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #eee;">
+        <span style="font-weight: 600; color: #2C3E50;">From:</span>
+        <span style="color: #4ECDC4;">${pickupAddressInput.value}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #eee;">
+        <span style="font-weight: 600; color: #2C3E50;">To:</span>
+        <span style="color: #4ECDC4;">${destinationAddressInput.value}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="font-weight: 600; color: #2C3E50;">Estimated Fare:</span>
+        <span style="color: #FF6B6B; font-size: 1.2rem; font-weight: bold;">₹${fare}</span>
+      </div>
+    </div>
+
+    <p style="text-align: center; color: #666; margin-bottom: 1.5rem;">
+      🚕 Finding drivers nearby...<br>
+      <small>You'll see the driver info when one accepts your request</small>
+    </p>
+
+    <button id="confirmDialogBtn" style="
+      width: 100%;
+      padding: 0.75rem;
+      background: #FF6B6B;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    " onmouseover="this.style.background='#ff5252'" onmouseout="this.style.background='#FF6B6B'">
+      Continue to Booking
+    </button>
+  `;
+
+  overlay.appendChild(confirmDialog);
+  document.body.appendChild(overlay);
+
+  // Add animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Handle continue button
+  document.getElementById('confirmDialogBtn').addEventListener('click', () => {
+    overlay.remove();
+    showBookingStatus();
+  });
+}
+
+/**
  * Show booking status section
  */
 function showBookingStatus() {
