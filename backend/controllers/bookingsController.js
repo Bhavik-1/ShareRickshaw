@@ -79,17 +79,8 @@ exports.createBooking = async (req, res) => {
       });
     }
 
-    // Check if at least one driver is online/available
-    const [drivers] = await db.query(
-      `SELECT id FROM driver_status WHERE is_online = TRUE`
-    );
-
-    if (drivers.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No drivers currently available'
-      });
-    }
+    // Note: Booking is created and broadcasted to all connected drivers via WebSocket
+    // No requirement for drivers to be pre-registered in driver_status table
 
     // Create booking without assigning to a specific driver (broadcast to all)
     const [result] = await db.query(
