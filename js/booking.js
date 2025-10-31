@@ -321,9 +321,9 @@ async function handleBookingSubmit(e) {
       throw new Error(data.message || 'Failed to create booking');
     }
 
-    // Success - store booking ID and transition to status section
+    // Success - store booking ID and show confirmation
     currentBookingId = data.data.booking_id;
-    showBookingStatus();
+    showBookingConfirmation(data.data);
 
   } catch (error) {
     console.error('Booking error:', error);
