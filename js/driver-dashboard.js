@@ -721,7 +721,5 @@ function getAuthToken() {
  */
 function handleLogout(e) {
   e.preventDefault();
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userRole');
-  window.location.href = 'login.html';
+  logout();
 }
