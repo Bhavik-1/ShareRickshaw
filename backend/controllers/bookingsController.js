@@ -91,16 +91,13 @@ exports.createBooking = async (req, res) => {
       });
     }
 
-    // Select first available driver (simple assignment)
-    const driverId = drivers[0].id;
-
-    // Create booking
+    // Create booking without assigning to a specific driver (broadcast to all)
     const [result] = await db.query(
       `INSERT INTO bookings
        (user_id, driver_id, pickup_latitude, pickup_longitude, destination_latitude,
         destination_longitude, pickup_address, destination_address, estimated_fare, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'requested')`,
-      [userId, driverId, pickup_latitude, pickup_longitude, destination_latitude,
+       VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, 'requested')`,
+      [userId, pickup_latitude, pickup_longitude, destination_latitude,
         destination_longitude, pickup_address.trim(), destination_address.trim(), fare]
     );
 
