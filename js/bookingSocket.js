@@ -341,8 +341,17 @@ function disconnectSocket() {
 // Initialize socket when page loads
 document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('authToken');
+
+  console.log('Booking socket initializing...');
+
+  // Load any existing booking ID
+  loadCurrentBookingId();
+
   if (token) {
     initializeSocket();
+    console.log('Socket initialized with token');
+  } else {
+    console.warn('No auth token found, socket not initialized');
   }
 });
 
