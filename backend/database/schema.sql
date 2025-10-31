@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS routes (
 CREATE TABLE IF NOT EXISTS bookings (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
-  driver_id INT NOT NULL,
+  driver_id INT NULL,
   pickup_latitude DECIMAL(10,8) NOT NULL,
   pickup_longitude DECIMAL(11,8) NOT NULL,
   destination_latitude DECIMAL(10,8) NOT NULL,
