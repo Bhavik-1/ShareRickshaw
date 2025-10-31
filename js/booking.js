@@ -323,6 +323,12 @@ async function handleBookingSubmit(e) {
 
     // Success - store booking ID and show confirmation
     currentBookingId = data.data.booking_id;
+
+    // Store pickup coordinates for distance calculation
+    localStorage.setItem('userPickupLat', pickupLatInput.value);
+    localStorage.setItem('userPickupLng', pickupLngInput.value);
+    localStorage.setItem('currentBookingId', currentBookingId);
+
     showBookingConfirmation(data.data);
 
   } catch (error) {
