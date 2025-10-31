@@ -580,6 +580,8 @@ async function handleCancelBooking(e) {
  * Handle new ride button
  */
 function handleNewRide() {
+  console.log('Resetting form for new ride');
+
   // Reset form
   rideRequestForm.reset();
   pickupLatInput.value = '';
@@ -593,11 +595,20 @@ function handleNewRide() {
   // Clear errors
   clearErrors();
 
-  // Show form section
+  // Show form section and hide others
+  bookingFormSection.classList.remove('hidden');
   bookingFormSection.classList.add('active');
+
   bookingStatusSection.classList.remove('active');
+  bookingStatusSection.classList.add('hidden');
+
   activeBookingSection.classList.remove('active');
+  activeBookingSection.classList.add('hidden');
+
   tripCompletedSection.classList.remove('active');
+  tripCompletedSection.classList.add('hidden');
+
+  console.log('Form reset and ready for new booking');
 }
 
 /**
