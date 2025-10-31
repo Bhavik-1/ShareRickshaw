@@ -507,14 +507,33 @@ function showBookingConfirmation(bookingData) {
  * Show booking status section
  */
 function showBookingStatus() {
+  console.log('Showing booking status section');
+
+  // Hide all sections
   bookingFormSection.classList.remove('active');
+  bookingFormSection.classList.add('hidden');
+
+  bookingStatusSection.classList.remove('hidden');
   bookingStatusSection.classList.add('active');
 
+  activeBookingSection.classList.remove('active');
+  activeBookingSection.classList.add('hidden');
+
+  tripCompletedSection.classList.remove('active');
+  tripCompletedSection.classList.add('hidden');
+
   // Populate status details
-  document.getElementById('statusPickup').textContent = pickupAddressInput.value;
-  document.getElementById('statusDestination').textContent = destinationAddressInput.value;
-  document.getElementById('statusFare').textContent = `₹${estimatedFareInput.value}`;
-  document.getElementById('statusBookingId').textContent = currentBookingId;
+  const pickupEl = document.getElementById('statusPickup');
+  const destEl = document.getElementById('statusDestination');
+  const fareEl = document.getElementById('statusFare');
+  const idEl = document.getElementById('statusBookingId');
+
+  if (pickupEl) pickupEl.textContent = pickupAddressInput.value;
+  if (destEl) destEl.textContent = destinationAddressInput.value;
+  if (fareEl) fareEl.textContent = `₹${estimatedFareInput.value}`;
+  if (idEl) idEl.textContent = currentBookingId;
+
+  console.log('Booking status displayed with ID:', currentBookingId);
 }
 
 /**
