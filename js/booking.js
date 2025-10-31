@@ -115,20 +115,88 @@ function initializeMapModal() {
   cancelBtn.addEventListener('click', closeMapModal);
   closeBtn.addEventListener('click', closeMapModal);
 
-  // Initialize Google Map (simplified without actual API key)
-  // In production, use actual Google Maps API
-  mapElement.style.background = '#e0e0e0';
-  mapElement.style.display = 'flex';
-  mapElement.style.alignItems = 'center';
-  mapElement.style.justifyContent = 'center';
-  mapElement.innerHTML = '<p>Map placeholder - Click to select location</p>';
+  // Predefined locations in Mumbai for easy selection
+  const mumbaiLocations = [
+    { name: 'Gateway of India', lat: 18.9520, lng: 72.8347 },
+    { name: 'Bandra', lat: 19.0596, lng: 72.8295 },
+    { name: 'Dadar', lat: 19.0176, lng: 72.8479 },
+    { name: 'Andheri', lat: 19.1136, lng: 72.8697 },
+    { name: 'Borivali', lat: 19.2183, lng: 72.8506 },
+    { name: 'Thane', lat: 19.2183, lng: 72.9781 },
+    { name: 'Colaba', lat: 18.9676, lng: 72.8194 },
+    { name: 'Worli', lat: 19.0176, lng: 72.8194 }
+  ];
 
-  mapElement.addEventListener('click', (e) => {
-    // Simplified location selection
-    selectedLocation = {
-      lat: 19.0760 + Math.random() * 0.2,
-      lng: 72.8777 + Math.random() * 0.2
-    };
+  // Create location buttons in map element
+  mapElement.style.background = '#f5f5f5';
+  mapElement.style.display = 'grid';
+  mapElement.style.gridTemplateColumns = 'repeat(2, 1fr)';
+  mapElement.style.gap = '10px';
+  mapElement.style.padding = '15px';
+  mapElement.style.overflowY = 'auto';
+  mapElement.innerHTML = '';
+
+  mumbaiLocations.forEach(location => {
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+      padding: 12px;
+      border: 2px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    `;
+    btn.textContent = location.name;
+    btn.addEventListener('mouseover', () => {
+      btn.style.borderColor = '#FF6B6B';
+      btn.style.background = '#fff5f5';
+    });
+    btn.addEventListener('mouseout', () => {
+      btn.style.borderColor = '#ddd';
+      btn.style.background = 'white';
+    });
+    btn.addEventListener('click', () => {
+      selectedLocation = {
+        lat: location.lat,
+        lng: location.lng
+      };
+      console.log(`Selected location: ${location.name} - (${location.lat}, ${location.lng})`);
+      btn.style.borderColor = '#51CF66';
+      btn.style.background = '#f1fae4';
+    });
+    mapElement.appendChild(btn);
+  });
+
+  // Add custom location input at the bottom
+  const customDiv = document.createElement('div');
+  customDiv.style.cssText = `
+    grid-column: 1 / -1;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+  `;
+  customDiv.innerHTML = `
+    <div style="margin-bottom: 8px; font-weight: 600;">Or enter coordinates:</div>
+    <input type="number" id="customLat" placeholder="Latitude (18.8-19.3)" step="0.0001" style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 4px;">
+    <input type="number" id="customLng" placeholder="Longitude (72.7-73.0)" step="0.0001" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+  `;
+  mapElement.appendChild(customDiv);
+
+  // Handle custom coordinates
+  mapElement.addEventListener('change', (e) => {
+    if (e.target.id === 'customLat' || e.target.id === 'customLng') {
+      const customLat = parseFloat(document.getElementById('customLat').value);
+      const customLng = parseFloat(document.getElementById('customLng').value);
+      if (customLat && customLng && customLat >= 18.8 && customLat <= 19.3 && customLng >= 72.7 && customLng <= 73.0) {
+        selectedLocation = {
+          lat: customLat,
+          lng: customLng
+        };
+        console.log(`Selected custom location: (${customLat}, ${customLng})`);
+      }
+    }
   });
 }
 
