@@ -150,21 +150,32 @@ function calculateFare() {
   const destLat = parseFloat(destinationLatInput.value);
   const destLng = parseFloat(destinationLngInput.value);
 
-  if (!pickupLat || !pickupLng || !destLat || !destLng) {
+  // Check if all coordinates are present and valid
+  if (!pickupLat || !pickupLng || !destLat || !destLng ||
+      isNaN(pickupLat) || isNaN(pickupLng) || isNaN(destLat) || isNaN(destLng)) {
+    console.log('Not all coordinates set yet');
     return;
   }
 
+  console.log(`Calculating fare from (${pickupLat}, ${pickupLng}) to (${destLat}, ${destLng})`);
+
   // Simplified fare calculation based on distance
   const distance = calculateDistance(pickupLat, pickupLng, destLat, destLng);
+  console.log(`Distance: ${distance.toFixed(2)} km`);
+
   const farePerKm = 15; // ₹15 per km
   const baseFare = 50; // ₹50 base fare
   const fare = Math.round(baseFare + distance * farePerKm);
+
+  console.log(`Calculated fare: ₹${fare}`);
 
   // Ensure fare is within bounds
   const finalFare = Math.max(10, Math.min(1000, fare));
 
   estimatedFareInput.value = finalFare;
   fareAmountDisplay.textContent = `₹${finalFare}`;
+
+  console.log(`Final fare: ₹${finalFare}`);
 }
 
 /**
