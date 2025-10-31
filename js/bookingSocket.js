@@ -183,6 +183,45 @@ function onNewMessage(data) {
 }
 
 /**
+ * Calculate and display distance from user to driver
+ */
+function calculateAndDisplayDistance(driverLat, driverLng) {
+  // Get user's pickup coordinates (from booking form or previous data)
+  // For now, we'll estimate based on the booking
+  const userLat = parseFloat(localStorage.getItem('userPickupLat') || '19.0760');
+  const userLng = parseFloat(localStorage.getItem('userPickupLng') || '72.8777');
+
+  // Calculate distance using Haversine formula
+  const distance = calculateHaversineDistance(userLat, userLng, driverLat, driverLng);
+
+  // Display distance
+  const distanceEl = document.getElementById('driverDistance');
+  if (distanceEl) {
+    const distanceText = distance < 1
+      ? `📍 Distance: ${Math.round(distance * 1000)}m away`
+      : `📍 Distance: ${distance.toFixed(1)}km away`;
+    distanceEl.textContent = distanceText;
+  }
+
+  console.log(`Distance to driver: ${distance.toFixed(2)}km`);
+}
+
+/**
+ * Calculate distance using Haversine formula
+ */
+function calculateHaversineDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
  * Update driver location on map
  */
 function updateDriverLocationOnMap(latitude, longitude) {
