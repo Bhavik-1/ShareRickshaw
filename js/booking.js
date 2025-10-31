@@ -143,11 +143,18 @@ function closeMapModal() {
  * Confirm map selection
  */
 function confirmMapSelection() {
-  destinationLatInput.value = selectedLocation.lat;
-  destinationLngInput.value = selectedLocation.lng;
+  destinationLatInput.value = selectedLocation.lat.toFixed(8);
+  destinationLngInput.value = selectedLocation.lng.toFixed(8);
   destinationAddressInput.value = `${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)}`;
-  calculateFare();
+
+  console.log(`Set destination coords - Lat: ${destinationLatInput.value}, Lng: ${destinationLngInput.value}`);
+
   closeMapModal();
+
+  // Trigger fare calculation
+  setTimeout(() => {
+    calculateFare();
+  }, 100);
 }
 
 /**
