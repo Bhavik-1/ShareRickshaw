@@ -62,8 +62,12 @@ io.on('connection', (socket) => {
   const userRole = socket.userRole;
   console.log(`User ${userId} (${userRole}) connected via WebSocket`);
 
+  // Register user socket
+  registerUserSocket(userId, socket);
+
   socket.on('disconnect', () => {
     console.log(`User ${userId} disconnected from WebSocket`);
+    unregisterUserSocket(userId, socket.id);
   });
 });
 
