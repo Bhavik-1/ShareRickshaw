@@ -647,15 +647,35 @@ function initializeMap() {
  * Show trip completed section
  */
 function showTripCompleted() {
+  console.log('Showing trip completed section');
+
+  // Hide all sections
+  bookingFormSection.classList.remove('active');
+  bookingFormSection.classList.add('hidden');
+
+  bookingStatusSection.classList.remove('active');
+  bookingStatusSection.classList.add('hidden');
+
   activeBookingSection.classList.remove('active');
+  activeBookingSection.classList.add('hidden');
+
+  tripCompletedSection.classList.remove('hidden');
   tripCompletedSection.classList.add('active');
 
   // Populate trip summary (simplified)
   const now = new Date();
-  document.getElementById('startTime').textContent = now.toLocaleTimeString();
-  document.getElementById('endTime').textContent = new Date(now.getTime() + 10 * 60000).toLocaleTimeString();
-  document.getElementById('tripDuration').textContent = '10 minutes';
-  document.getElementById('tripFare').textContent = `₹${estimatedFareInput.value}`;
+
+  const startTimeEl = document.getElementById('startTime');
+  const endTimeEl = document.getElementById('endTime');
+  const durationEl = document.getElementById('tripDuration');
+  const fareEl = document.getElementById('tripFare');
+
+  if (startTimeEl) startTimeEl.textContent = now.toLocaleTimeString();
+  if (endTimeEl) endTimeEl.textContent = new Date(now.getTime() + 10 * 60000).toLocaleTimeString();
+  if (durationEl) durationEl.textContent = '10 minutes';
+  if (fareEl) fareEl.textContent = `₹${estimatedFareInput.value}`;
+
+  console.log('Trip completed details populated');
 }
 
 /**
