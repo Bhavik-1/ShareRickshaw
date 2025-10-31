@@ -32,11 +32,35 @@ const todaysEarningsEl = document.getElementById('todaysEarnings');
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
   requireAuth();
+
+  // Check if user is autowala (driver)
+  const userRole = localStorage.getItem('userRole');
+  if (userRole !== 'autowala') {
+    showAccessDenied();
+    return;
+  }
+
   loadDriverInfo();
   initializeSocket();
   setupEventListeners();
   updateOnlineStatus();
 });
+
+/**
+ * Show access denied message
+ */
+function showAccessDenied() {
+  document.body.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f5f5f5;">
+      <div style="text-align: center; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🚫</div>
+        <h1 style="margin: 0 0 0.5rem 0; color: #2C3E50;">Access Denied</h1>
+        <p style="color: #666; margin: 0 0 1.5rem 0;">This dashboard is only for drivers (autowalas).</p>
+        <a href="index.html" style="display: inline-block; padding: 0.75rem 1.5rem; background: #FF6B6B; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Back to Home</a>
+      </div>
+    </div>
+  `;
+}
 
 /**
  * Load driver information from profile
