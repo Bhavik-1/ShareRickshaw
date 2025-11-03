@@ -269,7 +269,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const contactNameInput = document.getElementById("new-contact-name");
     const contactPhoneInput = document.getElementById("new-contact-phone");
     const contactEmailInput = document.getElementById("new-contact-email");
-  console.log('Email input element found:', contactEmailInput);
+
+  // Check if all required elements are found
+  if (!contactEmailInput) {
+    console.error('Email input field not found!');
+    return; // Exit if email field is not found
+  }
+
+  console.log('All elements found successfully');
     const successMsg = document.getElementById("contacts-success");
     const errorMsg = document.getElementById("contacts-error");
 
