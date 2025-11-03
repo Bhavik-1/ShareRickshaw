@@ -353,9 +353,11 @@ exports.addEmergencyContact = async (req, res) => {
 
   } catch (error) {
     console.error('Add emergency contact error:', error);
+    console.error('Request body received:', req.body);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
