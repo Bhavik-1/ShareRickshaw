@@ -97,8 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("userData", JSON.stringify(data.user));
 
-        // Redirect to home page
-        window.location.href = "index.html";
+        // Redirect based on user role
+        if (data.user.role === 'autowala') {
+          window.location.href = "driver-dashboard.html";
+        } else {
+          window.location.href = "index.html";
+        }
       } else {
         // Show error message
         generalError.textContent = data.message || "Invalid email or password";

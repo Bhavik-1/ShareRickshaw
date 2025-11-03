@@ -149,5 +149,31 @@
     <noscript>For the best experience, please enable JavaScript</noscript>
     <script src="script.js"></script>
     <script src="js/auth.js"></script>
+    <script>
+    // Redirect autowalas to dashboard
+    const userData = window.getUserData();
+    if (userData && userData.role === 'autowala') {
+      window.location.href = 'driver-dashboard.html';
+    }
+
+    // Hide/show features based on auth status
+    document.addEventListener('DOMContentLoaded', function() {
+      const bookingFeature = document.querySelector('a[href="booking.html"]').closest('.feature-card');
+      const driverFeature = document.querySelector('a[href="driver-dashboard.html"]').closest('.feature-card');
+      const safetyFeature = document.querySelector('a[href="safety.html"]').closest('.feature-card');
+
+      if (!window.isLoggedIn()) {
+        // Hide booking, driver, and safety features for guests
+        if (bookingFeature) bookingFeature.style.display = 'none';
+        if (driverFeature) driverFeature.style.display = 'none';
+        if (safetyFeature) safetyFeature.style.display = 'none';
+      } else if (userData.role === 'user') {
+        // Show booking and safety, hide driver for users
+        if (bookingFeature) bookingFeature.style.display = 'block';
+        if (driverFeature) driverFeature.style.display = 'none';
+        if (safetyFeature) safetyFeature.style.display = 'block';
+      }
+    });
+    </script>
 </body>
 </html>
