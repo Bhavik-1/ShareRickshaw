@@ -97,6 +97,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function triggerEmergencyAlert() {
         console.log('SOS: Starting emergency alert process');
+        console.log('SOS: Checking dependencies...');
+        console.log('SOS: locationService available:', typeof locationService !== 'undefined');
+        console.log('SOS: API_BASE_URL available:', typeof API_BASE_URL !== 'undefined');
+        console.log('SOS: getToken available:', typeof getToken !== 'undefined');
 
         // Hide any previous messages
         sosSuccess.classList.add('hidden');
