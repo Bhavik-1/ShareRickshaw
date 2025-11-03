@@ -135,13 +135,16 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const data = await response.json();
+            console.log('SOS: Response received:', data);
 
             if (data.success) {
                 // Success: Show detailed success message
+                console.log('SOS: Showing success message');
                 displaySOSSuccess(data);
                 sosSuccess.classList.remove('hidden');
             } else {
                 // Handle specific error cases
+                console.log('SOS: Showing error message:', data.message);
                 handleSOSError(data);
                 sosError.classList.remove('hidden');
             }
