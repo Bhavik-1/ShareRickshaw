@@ -307,12 +307,50 @@ class LocationService {
    */
   async captureSOSLocation() {
     try {
-      // Get high accuracy location
-      const rawLocation = await this.getCurrentLocation({
+      console.log('LocationService: Starting SOS location capture...');
+
+      // First try: High accuracy location with longer timeout
+      let rawLocation = await this.getCurrentLocation({
         enableHighAccuracy: true,
-        timeout: 20000, // 20 seconds timeout for emergency
-        maximumAge: 10000 // Use fresh location (10 seconds max age)
+        timeout: 30000, // 30 seconds timeout for emergency
+        maximumAge: 5000 // Use very fresh location (5 seconds max age)
       });
+
+      console.log('LocationService: First attempt - Accuracy:', rawLocation.accuracy, 'meters');
+
+      // If accuracy is poor (>1000m), try again with different settings
+      if (rawLocation.accuracy > 1000) {
+        console.log('LocationService: Poor accuracy detected, retrying...');
+
+        try {
+          // Second attempt: Moderate accuracy settings
+          rawLocation = await this.getCurrentLocation({
+            enableHighAccuracy: true,
+            timeout: 25000,
+            maximumAge: 1000
+          });
+          console.log('LocationService: Second attempt - Accuracy:', rawLocation.accuracy, 'meters');
+        } catch (error) {
+          console.warn('LocationService: Second attempt failed:', error.message);
+        }
+      }
+
+      // If still poor accuracy, try one more time with different settings
+      if (rawLocation.accuracy > 1000) {
+        console.log('LocationService: Still poor accuracy, final attempt...');
+
+        try {
+          // Third attempt: Standard GPS settings
+          rawLocation = await this.getCurrentLocation({
+            enableHighAccuracy: false,
+            timeout: 20000,
+            maximumAge: 30000
+          });
+          console.log('LocationService: Final attempt - Accuracy:', rawLocation.accuracy, 'meters');
+        } catch (error) {
+          console.warn('LocationService: Final attempt failed:', error.message);
+        }
+      }
 
       // Create formatted location object
       const location = this.createLocationObject(rawLocation);
