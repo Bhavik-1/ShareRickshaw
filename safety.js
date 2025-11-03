@@ -153,14 +153,55 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function displaySOSLocation(lat, lng) {
-        const coordsDiv = sosLocation.querySelector('.coords');
-        coordsDiv.textContent = formatCoordinates(lat, lng);
+    function displaySOSSuccess(data) {
+        const locationDiv = sosLocation.querySelector('.coords');
+        const successMsg = sosSuccess.querySelector('p');
+
+        // Update location display
+        locationDiv.innerHTML = `
+            <strong>📍 Your Location:</strong> ${locationService.formatCoordinates(data.location.latitude, data.location.longitude)}<br>
+            <small>Accuracy: ${data.location.accuracyDescription}</small><br>
+            <a href="${data.location.googleMapsUrl}" target="_blank" style="color: #2196f3; text-decoration: underline;">
+                🗺️ View on Google Maps
+            </a>
+        `;
+
+        // Update success message
+        successMsg.innerHTML = `
+            ✅ <strong>Emergency Alert Sent Successfully!</strong><br>
+            <small>Notified ${data.contactsNotified} of ${data.totalContacts} emergency contacts via email.</small>
+            ${data.contactsNotified < data.totalContacts ? `<br><small style="color: #ff9800;">⚠️ Some contacts may not have received the alert.</small>` : ''}
+        `;
+
+        // Show location section
+        sosLocation.classList.remove('hidden');
+    }
+
+    function handleSOSError(data) {
+        let errorMessage = data.message || 'Failed to send emergency alert';
+
+        // Handle specific error cases with helpful messages
+        if (data.requiresContacts) {
+            errorMessage = `No emergency contacts found. Please add emergency contacts with email addresses in your <a href="profile.html" style="color: #2196f3;">Profile</a> before using SOS.`;
+        } else if (data.requiresEmails) {
+            errorMessage = `Some emergency contacts don't have email addresses. Please update your contacts in your <a href="profile.html" style="color: #2196f3;">Profile</a> to enable email alerts.`;
+        } else if (data.requiresLocation) {
+            errorMessage = 'Location access is required for emergency alerts. Please enable location services and try again.';
+        } else if (data.cooldownRemaining) {
+            errorMessage = `Please wait ${data.cooldownRemaining} seconds before triggering another SOS alert.`;
+        }
+
+        showSOSError(errorMessage);
     }
 
     function showSOSError(message) {
-        sosError.textContent = message;
+        sosError.innerHTML = message; // Use innerHTML to support links
         sosError.classList.remove('hidden');
+    }
+
+    function displaySOSLocation(lat, lng) {
+        const coordsDiv = sosLocation.querySelector('.coords');
+        coordsDiv.textContent = formatCoordinates(lat, lng);
     }
 
     // ========================================
