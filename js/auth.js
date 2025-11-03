@@ -35,64 +35,55 @@ function updateNavBar() {
 
   if (!navLinks) return; // If nav-links doesn't exist, skip
 
-  if (isLoggedIn()) {
-    const userData = getUserData();
-    const username = userData?.username || userData?.driver_name || "User";
+  // Get user role
+  const userData = getUserData();
+  const userRole = userData?.role; // 'user' or 'autowala'
 
-    // Create auth navigation items
-    const authItems = `
-      <li><a href="profile.html">Profile</a></li>
-      <li><a href="#" onclick="logout(); return false;" style="color: #d32f2f;">Logout</a></li>
+  if (userRole === 'autowala') {
+    // Show driver navigation
+    const driverNav = `
+      <li><a href="driver-dashboard.html">🚗 Dashboard</a></li>
+      <li><a href="#" onclick="logout(); return false;" style="color: #d32f2f;">🚪 Logout</a></li>
     `;
 
-    // Add to desktop nav
-    navLinks.innerHTML = `
-      <li><a href="index.html">Home</a></li>
-      <li><a href="fare-calculator.html">Fare Calculator</a></li>
-      <li><a href="stands-map.html">Find Stands</a></li>
-      <li><a href="route-finder.html">Route Finder</a></li>
-      <li><a href="safety.html">Safety</a></li>
-      ${authItems}
-    `;
+    navLinks.innerHTML = driverNav;
 
-    // Add to mobile nav if exists
     if (mobileNavLinks) {
-      mobileNavLinks.innerHTML = `
-        <li><a href="index.html">Home</a></li>
-        <li><a href="fare-calculator.html">Fare Calculator</a></li>
-        <li><a href="stands-map.html">Find Stands</a></li>
-        <li><a href="route-finder.html">Route Finder</a></li>
-        <li><a href="safety.html">Safety</a></li>
-        ${authItems}
-      `;
+      mobileNavLinks.innerHTML = driverNav;
+    }
+  } else if (userRole === 'user') {
+    // Show user navigation with all user features
+    const userNav = `
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="fare-calculator.html">💰 Fare Calculator</a></li>
+      <li><a href="stands-map.html">🗺️ Find Stands</a></li>
+      <li><a href="route-finder.html">🎯 Route Finder</a></li>
+      <li><a href="safety.html">🚨 Safety</a></li>
+      <li><a href="booking.html">📱 Booking</a></li>
+      <li><a href="profile.html">👤 Profile</a></li>
+      <li><a href="#" onclick="logout(); return false;" style="color: #d32f2f;">🚪 Logout</a></li>
+    `;
+
+    navLinks.innerHTML = userNav;
+
+    if (mobileNavLinks) {
+      mobileNavLinks.innerHTML = userNav;
     }
   } else {
-    // User not logged in - show login/signup links
-    const guestItems = `
-      <li><a href="login.html">Login</a></li>
-      <li><a href="signup.html" style="color: #2196F3; font-weight: 600;">Sign Up</a></li>
+    // Show guest navigation with login/signup
+    const guestNav = `
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="fare-calculator.html">💰 Fare Calculator</a></li>
+      <li><a href="stands-map.html">🗺️ Find Stands</a></li>
+      <li><a href="route-finder.html">🎯 Route Finder</a></li>
+      <li><a href="login.html">🔐 Login</a></li>
+      <li><a href="signup.html" style="color: #2196F3; font-weight: 600;">✍️ Sign Up</a></li>
     `;
 
-    // Add to desktop nav
-    navLinks.innerHTML = `
-      <li><a href="index.html">Home</a></li>
-      <li><a href="fare-calculator.html">Fare Calculator</a></li>
-      <li><a href="stands-map.html">Find Stands</a></li>
-      <li><a href="route-finder.html">Route Finder</a></li>
-      <li><a href="safety.html">Safety</a></li>
-      ${guestItems}
-    `;
+    navLinks.innerHTML = guestNav;
 
-    // Add to mobile nav if exists
     if (mobileNavLinks) {
-      mobileNavLinks.innerHTML = `
-        <li><a href="index.html">Home</a></li>
-        <li><a href="fare-calculator.html">Fare Calculator</a></li>
-        <li><a href="stands-map.html">Find Stands</a></li>
-        <li><a href="route-finder.html">Route Finder</a></li>
-        <li><a href="safety.html">Safety</a></li>
-        ${guestItems}
-      `;
+      mobileNavLinks.innerHTML = guestNav;
     }
   }
 }
