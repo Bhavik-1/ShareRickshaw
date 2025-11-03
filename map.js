@@ -6,6 +6,7 @@
 let map;
 let markers = {};
 let standsData = [];
+let routeMarker = null; // Global variable for the temporary destination marker
 
 // --- FIX: Leaflet default icon path issue + custom small red icon ---
 if (typeof L !== "undefined") {
@@ -41,9 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
 // 1. Initialize Leaflet map
 function initMap() {
   // Create map centered on Mumbai
-  map = L.map("map").setView([19.076, 72.8777], 12);
+  map = L.map("map").setView([19.076, 72.8777], 12); // Add OpenStreetMap tile layer
 
-  // Add OpenStreetMap tile layer
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
     minZoom: 11,
@@ -73,26 +73,49 @@ async function fetchStands() {
   }
 }
 
-// 3. Create markers for all stands
+// 3. Create markers for all stands (MODIFIED to include popupopen event listener)
 function createMarkers(stands) {
   stands.forEach((stand) => {
     const marker = L.marker([stand.latitude, stand.longitude])
       .bindPopup(createPopupContent(stand))
-      .addTo(map);
+      .addTo(map); // Store marker reference
 
-    // Store marker reference
-    markers[stand.id] = marker;
+    markers[stand.id] = marker; // Click handler: zoom to marker
 
-    // Click handler: zoom to marker
     marker.on("click", function () {
       map.flyTo([stand.latitude, stand.longitude], 15, {
         duration: 0.5,
+      });
+    }); // NEW: Attach click handler to route list items when popup opens
+
+    marker.on("popupopen", function () {
+      // Clear any previous temporary marker when a new stand popup opens
+      if (routeMarker) {
+        map.removeLayer(routeMarker);
+        routeMarker = null;
+      }
+
+      const popup = marker.getPopup().getElement();
+      const routeItems = popup.querySelectorAll(".popup-route-item");
+
+      routeItems.forEach((item) => {
+        item.addEventListener("click", function () {
+          // Extract coordinates and destination name from data attributes
+          const lat = parseFloat(this.getAttribute("data-lat"));
+          const lng = parseFloat(this.getAttribute("data-lng"));
+          const name = this.getAttribute("data-name");
+
+          if (lat && lng && name) {
+            pinpointRouteDestination(lat, lng, name); // Close the stand's popup after clicking a route
+            marker.closePopup();
+          }
+        });
       });
     });
   });
 }
 
-// 4. Create popup HTML content
+// 4. Create popup HTML content (MODIFIED for compact UI)
 function createPopupContent(stand) {
   const maxRoutes = 5;
   const displayRoutes = stand.routes.slice(0, maxRoutes);
@@ -100,8 +123,14 @@ function createPopupContent(stand) {
 
   let routesList = displayRoutes
     .map(
-      (route) =>
-        `<li>${route.destination} → ₹${route.fare} | ${route.travel_time}</li>`
+      (route) => `
+      <li class="popup-route-item" data-lat="${route.destination_lat}" data-lng="${route.destination_lng}" data-name="${route.destination}">
+        <div class="popup-route-left">
+          <span class="icon">🎯</span>
+          <span>${route.destination}</span>
+        </div>
+        <div class="popup-route-details">₹${route.fare} | ${route.travel_time}</div>
+      </li>`
     )
     .join("");
 
@@ -111,16 +140,16 @@ function createPopupContent(stand) {
       : "";
 
   return `
-    <div class="stand-popup">
-      <h3 class="popup-title">${stand.name}</h3>
-      <p class="popup-hours">🕒 ${stand.operating_hours}</p>
-      <h4 class="popup-routes-heading">Available Routes:</h4>
-      <ul class="popup-routes-list">
-        ${routesList}
-      </ul>
-      ${moreText}
-    </div>
-  `;
+  <div class="stand-popup">
+    <h3 class="popup-title">${stand.name}</h3>
+    <p class="popup-hours">🕒 ${stand.operating_hours}</p>
+    <h4 class="popup-routes-heading">Available Routes</h4>
+    <ul class="popup-routes-list" id="route-list-${stand.id}">
+      ${routesList}
+    </ul>
+    ${moreText}
+  </div>
+`;
 }
 
 // 5. Create stand cards in list section
@@ -134,18 +163,16 @@ function createStandCards(stands) {
     card.dataset.standId = stand.id;
 
     card.innerHTML = `
-      <h3 class="card-title">${stand.name}</h3>
-      <p class="card-routes-count">${stand.routes.length} routes available</p>
-      <p class="card-hours">🕒 ${stand.operating_hours}</p>
-      <button class="btn-view-map" data-stand-id="${stand.id}">View on Map</button>
-    `;
+      <h3 class="card-title">${stand.name}</h3>
+      <p class="card-routes-count">${stand.routes.length} routes available</p>
+      <p class="card-hours">🕒 ${stand.operating_hours}</p>
+      <button class="btn-view-map" data-stand-id="${stand.id}">View on Map</button>
+    `; // Card click handler
 
-    // Card click handler
     card.addEventListener("click", function () {
       focusMarker(stand.id);
-    });
+    }); // Button click handler (same as card)
 
-    // Button click handler (same as card)
     const button = card.querySelector(".btn-view-map");
     button.addEventListener("click", function (e) {
       e.stopPropagation();
@@ -162,9 +189,8 @@ function focusMarker(standId) {
   document.getElementById("map").scrollIntoView({
     behavior: "smooth",
     block: "start",
-  });
+  }); // Trigger marker click after scroll
 
-  // Trigger marker click after scroll
   setTimeout(() => {
     markers[standId].fire("click");
   }, 500);
@@ -219,39 +245,33 @@ function performSearch(searchTerm) {
     const isMatch = nameMatch || routeMatch;
 
     if (isMatch) {
-      matchCount++;
-      // Show marker
+      matchCount++; // Show marker
       if (!map.hasLayer(markers[stand.id])) {
         markers[stand.id].addTo(map);
-      }
-      // Show card
+      } // Show card
       const card = document.querySelector(
         `.stand-card[data-stand-id="${stand.id}"]`
       );
       if (card) card.style.display = "block";
     } else {
       // Hide marker
-      map.removeLayer(markers[stand.id]);
-      // Hide card
+      map.removeLayer(markers[stand.id]); // Hide card
       const card = document.querySelector(
         `.stand-card[data-stand-id="${stand.id}"]`
       );
       if (card) card.style.display = "none";
     }
-  });
+  }); // Update heading
 
-  // Update heading
-  heading.textContent = `Showing ${matchCount} of ${standsData.length} stands`;
+  heading.textContent = `Showing ${matchCount} of ${standsData.length} stands`; // Show/hide no results message
 
-  // Show/hide no results message
   if (matchCount === 0) {
     noResults.style.display = "block";
     grid.style.display = "none";
   } else {
     noResults.style.display = "none";
-    grid.style.display = "grid";
+    grid.style.display = "grid"; // Fit map to visible markers
 
-    // Fit map to visible markers
     const visibleMarkers = Object.entries(markers)
       .filter(([id, marker]) => map.hasLayer(marker))
       .map(([id, marker]) => marker);
@@ -269,8 +289,7 @@ function showAllStands() {
     // Show all markers
     if (!map.hasLayer(markers[stand.id])) {
       markers[stand.id].addTo(map);
-    }
-    // Show all cards
+    } // Show all cards
     const card = document.querySelector(
       `.stand-card[data-stand-id="${stand.id}"]`
     );
@@ -290,8 +309,43 @@ function hideLoadingSpinner() {
 function showError(message) {
   const mapDiv = document.getElementById("map");
   mapDiv.innerHTML = `
-    <div style="display: flex; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center;">
-      <p style="font-size: 18px; color: #d32f2f;">${message}</p>
-    </div>
-  `;
+    <div style="display: flex; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center;">
+      <p style="font-size: 18px; color: #d32f2f;">${message}</p>
+    </div>
+  `;
+}
+
+// NEW FUNCTION: Pinpoints the destination on the map with a separate marker (MODIFIED icon size)
+function pinpointRouteDestination(lat, lng, destinationName) {
+  // 1. Remove old route marker if it exists
+  if (routeMarker) {
+    map.removeLayer(routeMarker);
+    routeMarker = null;
+  } // Define a distinct icon (Green marker for destination) // ADJUSTED SIZE: Smaller icon for less visual dominance
+
+  const destinationIcon = L.icon({
+    iconUrl:
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
+    iconRetinaUrl:
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [18, 30], // Adjusted size
+    iconAnchor: [9, 30], // Adjusted anchor
+    popupAnchor: [1, -25],
+  }); // 2. Create the new destination marker
+
+  routeMarker = L.marker([lat, lng], { icon: destinationIcon })
+    .bindPopup(
+      `<b>Route Destination:</b> ${destinationName}<br>Click again to hide.`,
+      { autoClose: false }
+    )
+    .addTo(map)
+    .openPopup(); // 3. Add an event listener to remove the marker on click
+
+  routeMarker.on("click", function () {
+    map.removeLayer(routeMarker);
+    routeMarker = null;
+  }); // 4. Pan the map to the new marker location
+
+  map.flyTo([lat, lng], 15, { duration: 0.5 });
 }
