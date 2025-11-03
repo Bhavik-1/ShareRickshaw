@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS emergency_contacts (
   user_id INT NOT NULL,
   contact_name VARCHAR(100) NOT NULL,
   contact_phone VARCHAR(15) NOT NULL,
+  contact_email VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_emergency_user
@@ -51,7 +52,8 @@ CREATE TABLE IF NOT EXISTS emergency_contacts (
     REFERENCES users(id)
     ON DELETE CASCADE,
 
-  INDEX idx_user_id (user_id)
+  INDEX idx_user_id (user_id),
+  INDEX idx_contact_email (contact_email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: stands
