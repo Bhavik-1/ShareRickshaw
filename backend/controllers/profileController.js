@@ -259,13 +259,13 @@ exports.updateProfile = async (req, res) => {
 exports.addEmergencyContact = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { contact_name, contact_phone } = req.body;
+    const { contact_name, contact_phone, contact_email } = req.body;
 
     // Validate required fields
-    if (!contact_name || !contact_phone) {
+    if (!contact_name || !contact_phone || !contact_email) {
       return res.status(400).json({
         success: false,
-        message: 'Contact name and phone are required'
+        message: 'Contact name, phone, and email are required'
       });
     }
 
