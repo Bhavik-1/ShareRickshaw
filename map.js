@@ -8,6 +8,11 @@ let markers = {};
 let standsData = [];
 let routeMarker = null; // Global variable for the temporary destination marker
 
+// NEW: Global variable for routing control and current stand location
+let routeControl = null;
+let currentStandLat = null;
+let currentStandLng = null;
+
 // --- FIX: Leaflet default icon path issue + custom small red icon ---
 if (typeof L !== "undefined") {
   // Fix Leaflet marker icon paths and use red small marker globally
@@ -73,7 +78,7 @@ async function fetchStands() {
   }
 }
 
-// 3. Create markers for all stands (MODIFIED to include popupopen event listener)
+// 3. Create markers for all stands (MODIFIED to store stand coords and call new routing logic)
 function createMarkers(stands) {
   stands.forEach((stand) => {
     const marker = L.marker([stand.latitude, stand.longitude])
@@ -86,14 +91,16 @@ function createMarkers(stands) {
       map.flyTo([stand.latitude, stand.longitude], 15, {
         duration: 0.5,
       });
-    }); // NEW: Attach click handler to route list items when popup opens
+    });
 
+    // MODIFIED: Attach click handler to route list items when popup opens
     marker.on("popupopen", function () {
-      // Clear any previous temporary marker when a new stand popup opens
-      if (routeMarker) {
-        map.removeLayer(routeMarker);
-        routeMarker = null;
-      }
+      // Clear any previous temporary marker AND route line
+      clearDestinationAndRoute();
+
+      // NEW: Store current stand's location
+      currentStandLat = stand.latitude;
+      currentStandLng = stand.longitude;
 
       const popup = marker.getPopup().getElement();
       const routeItems = popup.querySelectorAll(".popup-route-item");
@@ -101,12 +108,19 @@ function createMarkers(stands) {
       routeItems.forEach((item) => {
         item.addEventListener("click", function () {
           // Extract coordinates and destination name from data attributes
-          const lat = parseFloat(this.getAttribute("data-lat"));
-          const lng = parseFloat(this.getAttribute("data-lng"));
+          const destLat = parseFloat(this.getAttribute("data-lat"));
+          const destLng = parseFloat(this.getAttribute("data-lng"));
           const name = this.getAttribute("data-name");
 
-          if (lat && lng && name) {
-            pinpointRouteDestination(lat, lng, name); // Close the stand's popup after clicking a route
+          if (destLat && destLng && name) {
+            // NEW: Call the function to draw the road-following route and pinpoint destination
+            drawRouteAndPinpoint(
+              currentStandLat,
+              currentStandLng,
+              destLat,
+              destLng,
+              name
+            );
             marker.closePopup();
           }
         });
@@ -315,37 +329,92 @@ function showError(message) {
   `;
 }
 
-// NEW FUNCTION: Pinpoints the destination on the map with a separate marker (MODIFIED icon size)
-function pinpointRouteDestination(lat, lng, destinationName) {
-  // 1. Remove old route marker if it exists
+// NEW FUNCTION: Clears the destination marker and the routing line
+function clearDestinationAndRoute() {
+  // Clear previous destination marker
   if (routeMarker) {
     map.removeLayer(routeMarker);
     routeMarker = null;
-  } // Define a distinct icon (Green marker for destination) // ADJUSTED SIZE: Smaller icon for less visual dominance
+  }
 
+  // Clear previous route control
+  if (routeControl) {
+    map.removeControl(routeControl);
+    routeControl = null;
+  }
+}
+
+// NEW FUNCTION: Draws the road-following route and pinpoints the destination
+function drawRouteAndPinpoint(
+  startLat,
+  startLng,
+  endLat,
+  endLng,
+  destinationName
+) {
+  // 1. Clear any existing route/marker
+  clearDestinationAndRoute();
+
+  // 2. Define distinct icon (Green marker for destination)
   const destinationIcon = L.icon({
     iconUrl:
       "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
     iconRetinaUrl:
       "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [18, 30], // Adjusted size
-    iconAnchor: [9, 30], // Adjusted anchor
+    iconSize: [18, 30],
+    iconAnchor: [9, 30],
     popupAnchor: [1, -25],
-  }); // 2. Create the new destination marker
+  });
 
-  routeMarker = L.marker([lat, lng], { icon: destinationIcon })
+  // 3. Create the new destination marker
+  routeMarker = L.marker([endLat, endLng], { icon: destinationIcon })
     .bindPopup(
-      `<b>Route Destination:</b> ${destinationName}<br>Click again to hide.`,
+      `<b>Route Destination:</b> ${destinationName}<br>Click again to hide route.`,
       { autoClose: false }
     )
     .addTo(map)
-    .openPopup(); // 3. Add an event listener to remove the marker on click
+    .openPopup();
 
+  // 4. Add click listener to remove the marker/route on click
   routeMarker.on("click", function () {
-    map.removeLayer(routeMarker);
-    routeMarker = null;
-  }); // 4. Pan the map to the new marker location
+    clearDestinationAndRoute();
+  });
 
-  map.flyTo([lat, lng], 15, { duration: 0.5 });
+  // 5. Draw the road-following route using Leaflet Routing Machine
+
+  // Check if L.Routing is available (i.e., if the CDN script loaded)
+  if (typeof L.Routing === "undefined") {
+    console.error(
+      "Leaflet Routing Machine not loaded. Route drawing disabled."
+    );
+
+    // Fallback: simply fly to the destination if routing isn't available
+    map.flyTo([endLat, endLng], 15, { duration: 0.5 });
+    return;
+  }
+
+  // Create routing control
+  routeControl = L.Routing.control({
+    waypoints: [L.latLng(startLat, startLng), L.latLng(endLat, endLng)],
+    // Use OSRM Public service for directions
+    router: L.Routing.osrmv1({
+      serviceUrl: "https://router.project-osrm.org/route/v1",
+    }),
+    routeWhileDragging: false,
+    createMarker: function () {
+      return null;
+    }, // Disable default markers as we already have one
+    lineOptions: {
+      styles: [{ color: "#1976d2", weight: 6, opacity: 0.8 }],
+    },
+    // SHOW the directions panel but hide the summary with CSS
+    show: true,
+    // Ensure the panel is open by default
+    collapsed: false,
+    // Position the instructions panel
+    position: "topleft",
+    // Make sure the route line fits the view after drawing
+    fitSelectedRoutes: "smart",
+  }).addTo(map);
 }
