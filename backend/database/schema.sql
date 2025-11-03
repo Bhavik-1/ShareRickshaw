@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS emergency_contacts (
   user_id INT NOT NULL,
   contact_name VARCHAR(100) NOT NULL,
   contact_phone VARCHAR(15) NOT NULL,
+  contact_email VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_emergency_user
@@ -51,7 +52,8 @@ CREATE TABLE IF NOT EXISTS emergency_contacts (
     REFERENCES users(id)
     ON DELETE CASCADE,
 
-  INDEX idx_user_id (user_id)
+  INDEX idx_user_id (user_id),
+  INDEX idx_contact_email (contact_email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: stands
@@ -179,5 +181,25 @@ CREATE TABLE IF NOT EXISTS booking_messages (
     ON DELETE CASCADE,
 
   INDEX idx_booking_id (booking_id),
+  INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: sos_logs
+-- Purpose: Track SOS triggers for safety audit and debugging
+CREATE TABLE IF NOT EXISTS sos_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  latitude DECIMAL(10,8) NOT NULL,
+  longitude DECIMAL(11,8) NOT NULL,
+  accuracy DECIMAL(8,2),
+  contacts_count INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_sos_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+  INDEX idx_user_id (user_id),
   INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

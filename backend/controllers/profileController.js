@@ -24,7 +24,7 @@ exports.getProfile = async (req, res) => {
     // If role is 'user', fetch emergency contacts
     if (user.role === 'user') {
       const [emergencyContacts] = await db.query(
-        'SELECT id, contact_name, contact_phone FROM emergency_contacts WHERE user_id = ? ORDER BY created_at ASC',
+        'SELECT id, contact_name, contact_phone, contact_email FROM emergency_contacts WHERE user_id = ? ORDER BY created_at ASC',
         [userId]
       );
 
@@ -259,13 +259,13 @@ exports.updateProfile = async (req, res) => {
 exports.addEmergencyContact = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { contact_name, contact_phone } = req.body;
+    const { contact_name, contact_phone, contact_email } = req.body;
 
     // Validate required fields
-    if (!contact_name || !contact_phone) {
+    if (!contact_name || !contact_phone || !contact_email) {
       return res.status(400).json({
         success: false,
-        message: 'Contact name and phone are required'
+        message: 'Contact name, phone, and email are required'
       });
     }
 
@@ -293,6 +293,7 @@ exports.addEmergencyContact = async (req, res) => {
     // Trim inputs
     const trimmedName = contact_name.trim();
     const trimmedPhone = contact_phone.trim();
+    const trimmedEmail = contact_email.trim().toLowerCase();
 
     // Validate contact name length
     if (trimmedName.length < 2 || trimmedName.length > 100) {
@@ -311,10 +312,32 @@ exports.addEmergencyContact = async (req, res) => {
       });
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format'
+      });
+    }
+
+    // Check for duplicate email within user's contacts
+    const [existingContacts] = await db.query(
+      'SELECT id FROM emergency_contacts WHERE user_id = ? AND contact_email = ?',
+      [userId, trimmedEmail]
+    );
+
+    if (existingContacts.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'A contact with this email already exists'
+      });
+    }
+
     // Insert into emergency_contacts table
     const [result] = await db.query(
-      'INSERT INTO emergency_contacts (user_id, contact_name, contact_phone, created_at) VALUES (?, ?, ?, NOW())',
-      [userId, trimmedName, trimmedPhone]
+      'INSERT INTO emergency_contacts (user_id, contact_name, contact_phone, contact_email, created_at) VALUES (?, ?, ?, ?, NOW())',
+      [userId, trimmedName, trimmedPhone, trimmedEmail]
     );
 
     res.status(201).json({
@@ -323,15 +346,18 @@ exports.addEmergencyContact = async (req, res) => {
       contact: {
         id: result.insertId,
         contact_name: trimmedName,
-        contact_phone: trimmedPhone
+        contact_phone: trimmedPhone,
+        contact_email: trimmedEmail
       }
     });
 
   } catch (error) {
     console.error('Add emergency contact error:', error);
+    console.error('Request body received:', req.body);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

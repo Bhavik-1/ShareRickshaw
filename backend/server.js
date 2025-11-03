@@ -14,6 +14,9 @@ const profileRoutes = require('./routes/profile');
 const standsRoutes = require('./routes/stands');
 const routesRoutes = require('./routes/routes');
 const bookingsRoutes = require('./routes/bookings');
+console.log('Server: Loading safety routes...');
+const safetyRoutes = require('./routes/safety');
+console.log('Server: Safety routes loaded:', typeof safetyRoutes);
 
 // Import middleware and services
 const socketAuth = require('./middleware/socketAuth');
@@ -77,6 +80,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/stands', standsRoutes);
 app.use('/api/routes', routesRoutes);
 app.use('/api/bookings', bookingsRoutes);
+app.use('/api/safety', safetyRoutes);
 
 // Driver status routes
 const bookingsCtrl = require('./controllers/bookingsController');
@@ -95,6 +99,7 @@ app.get('/', (req, res) => {
       stands: '/api/stands',
       routes: '/api/routes',
       bookings: '/api/bookings',
+      safety: '/api/safety',
       driverStatus: '/api/driver-status'
     }
   });

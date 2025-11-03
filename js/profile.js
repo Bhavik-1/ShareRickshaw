@@ -106,7 +106,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="contact-item">
           <div class="contact-info">
             <div class="contact-name">${contact.contact_name}</div>
-            <div class="contact-phone">${contact.contact_phone}</div>
+            <div class="contact-phone">📱 ${contact.contact_phone}</div>
+            ${contact.contact_email ? `<div class="contact-email">✉️ ${contact.contact_email}</div>` : ''}
           </div>
           <button class="btn-delete" data-contact-id="${contact.id}">Delete</button>
         </div>
@@ -267,6 +268,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cancelBtn = document.getElementById("cancel-add-contact");
     const contactNameInput = document.getElementById("new-contact-name");
     const contactPhoneInput = document.getElementById("new-contact-phone");
+    const contactEmailInput = document.getElementById("new-contact-email");
+
+  // Check if all required elements are found
+  if (!contactEmailInput) {
+    console.error('Email input field not found!');
+    return; // Exit if email field is not found
+  }
+
+  console.log('All elements found successfully');
     const successMsg = document.getElementById("contacts-success");
     const errorMsg = document.getElementById("contacts-error");
 
@@ -282,12 +292,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       showFormBtn.style.display = "block";
       contactNameInput.value = "";
       contactPhoneInput.value = "";
+      contactEmailInput.value = "";
     });
 
     // Save contact
     saveContactBtn.addEventListener("click", async () => {
       const name = contactNameInput.value.trim();
       const phone = contactPhoneInput.value.trim();
+      const email = contactEmailInput.value.trim();
 
       // Validate
       if (name.length < 2 || name.length > 100) {
@@ -300,6 +312,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       const phoneRegex = /^\d{10}$/;
       if (!phoneRegex.test(phone)) {
         errorMsg.textContent = "Contact phone must be exactly 10 digits";
+        errorMsg.classList.add("show");
+        setTimeout(() => errorMsg.classList.remove("show"), 5000);
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        errorMsg.textContent = "Please enter a valid email address";
         errorMsg.classList.add("show");
         setTimeout(() => errorMsg.classList.remove("show"), 5000);
         return;
@@ -320,6 +341,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             body: JSON.stringify({
               contact_name: name,
               contact_phone: phone,
+              contact_email: email,
             }),
           }
         );

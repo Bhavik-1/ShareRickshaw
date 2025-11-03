@@ -171,6 +171,13 @@
         font-size: 0.95rem;
       }
 
+      .contact-email {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 3px;
+        word-break: break-word;
+      }
+
       .btn-delete {
         padding: 8px 20px;
         background: #fff;
@@ -412,6 +419,19 @@
               maxlength="10"
               placeholder="Contact phone number"
             />
+          </div>
+
+          <div class="profile-field">
+            <label>Contact Email *</label>
+            <input
+              type="email"
+              id="new-contact-email"
+              placeholder="Contact email address"
+              required
+            />
+            <small style="color: #666; font-size: 0.85rem; margin-top: 5px; display: block;">
+              This email will receive emergency alerts when SOS is triggered
+            </small>
           </div>
 
           <div class="button-group">
