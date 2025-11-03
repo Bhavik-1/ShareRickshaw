@@ -267,6 +267,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cancelBtn = document.getElementById("cancel-add-contact");
     const contactNameInput = document.getElementById("new-contact-name");
     const contactPhoneInput = document.getElementById("new-contact-phone");
+    const contactEmailInput = document.getElementById("new-contact-email");
     const successMsg = document.getElementById("contacts-success");
     const errorMsg = document.getElementById("contacts-error");
 
