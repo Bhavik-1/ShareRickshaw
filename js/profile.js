@@ -106,7 +106,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="contact-item">
           <div class="contact-info">
             <div class="contact-name">${contact.contact_name}</div>
-            <div class="contact-phone">${contact.contact_phone}</div>
+            <div class="contact-phone">📱 ${contact.contact_phone}</div>
+            ${contact.contact_email ? `<div class="contact-email">✉️ ${contact.contact_email}</div>` : ''}
           </div>
           <button class="btn-delete" data-contact-id="${contact.id}">Delete</button>
         </div>
