@@ -175,9 +175,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const successMsg = sosSuccess.querySelector('p');
 
         // Update location display
+        const accuracyWarning = data.location.accuracy > 1000 ?
+            `<br><small style="color: #ff9800;">⚠️ Location accuracy is low (${data.location.accuracy}m). GPS signal may be weak indoors.</small>` : '';
+
         locationDiv.innerHTML = `
             <strong>📍 Your Location:</strong> ${locationService.formatCoordinates(data.location.latitude, data.location.longitude)}<br>
-            <small>Accuracy: ${data.location.accuracyDescription}</small><br>
+            <small>Accuracy: ${data.location.accuracyDescription}</small>${accuracyWarning}<br>
             <a href="${data.location.googleMapsUrl}" target="_blank" style="color: #2196f3; text-decoration: underline;">
                 🗺️ View on Google Maps
             </a>
