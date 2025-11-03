@@ -2,51 +2,55 @@
  * Driver Dashboard - Real-time booking management
  */
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = "http://localhost:3000/api";
 let socket = null;
 let currentBookingId = null;
 let isOnline = false;
-let driverName = '';
-let licensePlate = '';
+let driverName = "";
+let licensePlate = "";
 let todaysTripsCount = 0;
 let todaysEarnings = 0;
 
 // DOM Elements
-const onlineToggle = document.getElementById('onlineToggle');
-const driverNameEl = document.getElementById('driverName');
-const licensePlateEl = document.getElementById('licensePlate');
-const bookingRequestsContainer = document.getElementById('bookingRequestsContainer');
-const activeBookingContainer = document.getElementById('activeBookingContainer');
-const logoutBtn = document.getElementById('logoutBtn');
-const tabButtons = document.querySelectorAll('.tab-btn');
-const tabContents = document.querySelectorAll('.tab-content');
-const startTripBtn = document.getElementById('startTripBtn');
-const completeTripBtn = document.getElementById('completeTripBtn');
-const updateLocationBtn = document.getElementById('updateLocationBtn');
-const sendChatBtn = document.getElementById('sendChatBtn');
-const chatInput = document.getElementById('chatInput');
-const chatMessages = document.getElementById('chatMessages');
-const todaysTripsEl = document.getElementById('todaysTrips');
-const todaysEarningsEl = document.getElementById('todaysEarnings');
+const onlineToggle = document.getElementById("onlineToggle");
+const driverNameEl = document.getElementById("driverName");
+const licensePlateEl = document.getElementById("licensePlate");
+const bookingRequestsContainer = document.getElementById(
+  "bookingRequestsContainer"
+);
+const activeBookingContainer = document.getElementById(
+  "activeBookingContainer"
+);
+const logoutBtn = document.getElementById("logoutBtn");
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabContents = document.querySelectorAll(".tab-content");
+const startTripBtn = document.getElementById("startTripBtn");
+const completeTripBtn = document.getElementById("completeTripBtn");
+const updateLocationBtn = document.getElementById("updateLocationBtn");
+const sendChatBtn = document.getElementById("sendChatBtn");
+const chatInput = document.getElementById("chatInput");
+const chatMessages = document.getElementById("chatMessages");
+const todaysTripsEl = document.getElementById("todaysTrips");
+const todaysEarningsEl = document.getElementById("todaysEarnings");
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   requireAuth();
 
   // Check if user is autowala (driver)
   const userData = getUserData();
 
-  console.log('User Data:', userData);
-  console.log('User Role:', userData?.role);
+  console.log("User Data:", userData);
+  console.log("User Role:", userData?.role);
 
   // Check if role is autowala
-  if (!userData || userData.role !== 'autowala') {
-    console.warn('Access denied - User role:', userData?.role);
+  if (!userData || userData.role !== "autowala") {
+    console.warn("Access denied - User role:", userData?.role);
     showAccessDenied();
     return;
   }
 
-  console.log('Access granted for autowala');
+  console.log("Access granted for autowala");
   loadDriverInfo();
   initializeSocket();
   setupEventListeners();
@@ -72,25 +76,31 @@ function showAccessDenied() {
 /**
  * Load driver information from profile
  */
+// File: js/driver-dashboard.js (Corrected loadDriverInfo function)
+
 async function loadDriverInfo() {
   try {
     const token = getAuthToken();
     const response = await fetch(`${API_BASE}/profile`, {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data = await response.json();
-    if (data.success && data.data.autowala_details) {
-      const details = data.data.autowala_details;
-      driverName = details.driver_name || 'Driver';
-      licensePlate = details.license_plate || 'N/A';
+
+    // FIX: The backend returns data under the 'user' key, not data.data.autowala_details
+    if (data.success && data.user) {
+      // Data structure: { success: true, user: { driver_name: '...', license_plate: '...' } }
+      const details = data.user;
+
+      driverName = details.driver_name || "Driver";
+      licensePlate = details.license_plate || "N/A";
       driverNameEl.textContent = driverName;
       licensePlateEl.textContent = licensePlate;
     }
   } catch (error) {
-    console.error('Failed to load driver info:', error);
+    console.error("Failed to load driver info:", error);
   }
 }
 
@@ -100,42 +110,42 @@ async function loadDriverInfo() {
 function initializeSocket() {
   const token = getAuthToken();
 
-  socket = io('http://localhost:3000', {
+  socket = io("http://localhost:3000", {
     auth: {
-      token: token
+      token: token,
     },
-    reconnection: true
+    reconnection: true,
   });
 
-  socket.on('connect', () => {
-    console.log('Connected to server');
+  socket.on("connect", () => {
+    console.log("Connected to server");
   });
 
-  socket.on('booking_request', onIncomingBookingRequest);
-  socket.on('booking_accepted', onBookingAccepted);
-  socket.on('booking_cancelled', onBookingCancelled);
-  socket.on('new_message', onNewMessage);
-  socket.on('trip_started', onTripStarted);
-  socket.on('trip_completed', onTripCompleted);
+  socket.on("booking_request", onIncomingBookingRequest);
+  socket.on("booking_accepted", onBookingAccepted);
+  socket.on("booking_cancelled", onBookingCancelled);
+  socket.on("new_message", onNewMessage);
+  socket.on("trip_started", onTripStarted);
+  socket.on("trip_completed", onTripCompleted);
 }
 
 /**
  * Setup event listeners
  */
 function setupEventListeners() {
-  onlineToggle.addEventListener('click', toggleOnlineStatus);
-  logoutBtn.addEventListener('click', handleLogout);
-  startTripBtn.addEventListener('click', handleStartTrip);
-  completeTripBtn.addEventListener('click', handleCompleteTrip);
-  updateLocationBtn.addEventListener('click', handleUpdateLocation);
-  sendChatBtn.addEventListener('click', handleSendMessage);
-  chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') handleSendMessage();
+  onlineToggle.addEventListener("click", toggleOnlineStatus);
+  logoutBtn.addEventListener("click", handleLogout);
+  startTripBtn.addEventListener("click", handleStartTrip);
+  completeTripBtn.addEventListener("click", handleCompleteTrip);
+  updateLocationBtn.addEventListener("click", handleUpdateLocation);
+  sendChatBtn.addEventListener("click", handleSendMessage);
+  chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") handleSendMessage();
   });
 
   // Tab switching
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', switchTab);
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", switchTab);
   });
 }
 
@@ -148,30 +158,32 @@ async function toggleOnlineStatus() {
     const newStatus = !isOnline;
 
     const response = await fetch(`${API_BASE}/driver-status/update`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         is_online: newStatus,
-        availability_status: newStatus ? 'available' : 'busy'
-      })
+        availability_status: newStatus ? "available" : "busy",
+      }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to update status');
+      throw new Error(data.message || "Failed to update status");
     }
 
     isOnline = newStatus;
     updateOnlineStatus();
-    showNotification(newStatus ? 'You are now online' : 'You are now offline', 'info');
-
+    showNotification(
+      newStatus ? "You are now online" : "You are now offline",
+      "info"
+    );
   } catch (error) {
-    console.error('Status update error:', error);
-    showNotification(error.message, 'error');
+    console.error("Status update error:", error);
+    showNotification(error.message, "error");
   }
 }
 
@@ -180,13 +192,15 @@ async function toggleOnlineStatus() {
  */
 function updateOnlineStatus() {
   if (isOnline) {
-    onlineToggle.classList.remove('offline');
-    onlineToggle.classList.add('online');
-    onlineToggle.innerHTML = '<span class="status-indicator"></span><span class="status-text">Online</span>';
+    onlineToggle.classList.remove("offline");
+    onlineToggle.classList.add("online");
+    onlineToggle.innerHTML =
+      '<span class="status-indicator"></span><span class="status-text">Online</span>';
   } else {
-    onlineToggle.classList.remove('online');
-    onlineToggle.classList.add('offline');
-    onlineToggle.innerHTML = '<span class="status-indicator"></span><span class="status-text">Offline</span>';
+    onlineToggle.classList.remove("online");
+    onlineToggle.classList.add("offline");
+    onlineToggle.innerHTML =
+      '<span class="status-indicator"></span><span class="status-text">Offline</span>';
   }
 }
 
@@ -194,25 +208,25 @@ function updateOnlineStatus() {
  * Handle incoming booking request
  */
 function onIncomingBookingRequest(data) {
-  console.log('New booking request:', data);
+  console.log("New booking request:", data);
 
   if (!isOnline) return; // Ignore requests if offline
 
   const card = createRequestCard(data);
-  bookingRequestsContainer.innerHTML = '';
+  bookingRequestsContainer.innerHTML = "";
   bookingRequestsContainer.appendChild(card);
-  showNotification('New booking request!', 'success');
+  showNotification("New booking request!", "success");
 }
 
 /**
  * Create booking request card
  */
 function createRequestCard(bookingData) {
-  const card = document.createElement('div');
-  card.className = 'request-card';
+  const card = document.createElement("div");
+  card.className = "request-card";
 
-  const pickupAddress = bookingData.pickup_address || 'Pickup';
-  const destAddress = bookingData.destination_address || 'Destination';
+  const pickupAddress = bookingData.pickup_address || "Pickup";
+  const destAddress = bookingData.destination_address || "Destination";
   const fare = bookingData.estimated_fare || 0;
 
   card.innerHTML = `
@@ -246,26 +260,25 @@ async function acceptBooking(bookingId) {
     const token = getAuthToken();
 
     const response = await fetch(`${API_BASE}/bookings/${bookingId}/accept`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to accept booking');
+      throw new Error(data.message || "Failed to accept booking");
     }
 
     currentBookingId = bookingId;
-    showNotification('Booking accepted!', 'success');
+    showNotification("Booking accepted!", "success");
     clearRequests();
     loadBookingDetails(bookingId);
-
   } catch (error) {
-    console.error('Accept booking error:', error);
-    showNotification(error.message, 'error');
+    console.error("Accept booking error:", error);
+    showNotification(error.message, "error");
   }
 }
 
@@ -273,34 +286,33 @@ async function acceptBooking(bookingId) {
  * Reject booking
  */
 async function rejectBooking(bookingId) {
-  const reason = prompt('Reason for rejection (optional):');
+  const reason = prompt("Reason for rejection (optional):");
 
   try {
     const token = getAuthToken();
 
     const response = await fetch(`${API_BASE}/bookings/${bookingId}/reject`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        reason: reason || 'Driver rejected'
-      })
+        reason: reason || "Driver rejected",
+      }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to reject booking');
+      throw new Error(data.message || "Failed to reject booking");
     }
 
-    showNotification('Booking rejected', 'info');
+    showNotification("Booking rejected", "info");
     clearRequests();
-
   } catch (error) {
-    console.error('Reject booking error:', error);
-    showNotification(error.message, 'error');
+    console.error("Reject booking error:", error);
+    showNotification(error.message, "error");
   }
 }
 
@@ -308,7 +320,7 @@ async function rejectBooking(bookingId) {
  * Handle booking accepted
  */
 function onBookingAccepted(data) {
-  console.log('Booking accepted:', data);
+  console.log("Booking accepted:", data);
   currentBookingId = data.booking_id;
   loadBookingDetails(data.booking_id);
 }
@@ -317,8 +329,8 @@ function onBookingAccepted(data) {
  * Handle booking cancelled
  */
 function onBookingCancelled(data) {
-  console.log('Booking cancelled:', data);
-  showNotification(`Booking cancelled: ${data.reason}`, 'warning');
+  console.log("Booking cancelled:", data);
+  showNotification(`Booking cancelled: ${data.reason}`, "warning");
   clearBooking();
 }
 
@@ -331,31 +343,34 @@ async function loadBookingDetails(bookingId) {
 
     const response = await fetch(`${API_BASE}/bookings/${bookingId}`, {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to load booking');
+      throw new Error(data.message || "Failed to load booking");
     }
 
     const booking = data.data;
 
     // Update UI
-    document.getElementById('tripPickup').textContent = booking.pickup_address;
-    document.getElementById('tripDestination').textContent = booking.destination_address;
-    document.getElementById('tripFare').textContent = `₹${booking.estimated_fare}`;
-    document.getElementById('tripStatus').textContent = booking.status;
+    document.getElementById("tripPickup").textContent = booking.pickup_address;
+    document.getElementById("tripDestination").textContent =
+      booking.destination_address;
+    document.getElementById(
+      "tripFare"
+    ).textContent = `₹${booking.estimated_fare}`;
+    document.getElementById("tripStatus").textContent = booking.status;
 
     // Update buttons
-    if (booking.status === 'accepted') {
-      startTripBtn.classList.remove('hidden');
-      completeTripBtn.classList.add('hidden');
-    } else if (booking.status === 'in_transit') {
-      startTripBtn.classList.add('hidden');
-      completeTripBtn.classList.remove('hidden');
+    if (booking.status === "accepted") {
+      startTripBtn.classList.remove("hidden");
+      completeTripBtn.classList.add("hidden");
+    } else if (booking.status === "in_transit") {
+      startTripBtn.classList.add("hidden");
+      completeTripBtn.classList.remove("hidden");
     }
 
     // Load messages
@@ -363,9 +378,8 @@ async function loadBookingDetails(bookingId) {
 
     // Update active booking display
     updateActiveBookingDisplay(booking);
-
   } catch (error) {
-    console.error('Load booking error:', error);
+    console.error("Load booking error:", error);
   }
 }
 
@@ -373,8 +387,8 @@ async function loadBookingDetails(bookingId) {
  * Update active booking display
  */
 function updateActiveBookingDisplay(booking) {
-  const card = document.createElement('div');
-  card.className = 'active-booking-card';
+  const card = document.createElement("div");
+  card.className = "active-booking-card";
 
   card.innerHTML = `
     <div class="booking-header">Active Booking</div>
@@ -396,7 +410,7 @@ function updateActiveBookingDisplay(booking) {
     </div>
   `;
 
-  activeBookingContainer.innerHTML = '';
+  activeBookingContainer.innerHTML = "";
   activeBookingContainer.appendChild(card);
 }
 
@@ -409,27 +423,29 @@ async function handleStartTrip() {
   try {
     const token = getAuthToken();
 
-    const response = await fetch(`${API_BASE}/bookings/${currentBookingId}/start`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const response = await fetch(
+      `${API_BASE}/bookings/${currentBookingId}/start`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    });
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to start trip');
+      throw new Error(data.message || "Failed to start trip");
     }
 
-    showNotification('Trip started!', 'success');
-    startTripBtn.classList.add('hidden');
-    completeTripBtn.classList.remove('hidden');
+    showNotification("Trip started!", "success");
+    startTripBtn.classList.add("hidden");
+    completeTripBtn.classList.remove("hidden");
     loadBookingDetails(currentBookingId);
-
   } catch (error) {
-    console.error('Start trip error:', error);
-    showNotification(error.message, 'error');
+    console.error("Start trip error:", error);
+    showNotification(error.message, "error");
   }
 }
 
@@ -442,30 +458,32 @@ async function handleCompleteTrip() {
   try {
     const token = getAuthToken();
 
-    const response = await fetch(`${API_BASE}/bookings/${currentBookingId}/complete`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const response = await fetch(
+      `${API_BASE}/bookings/${currentBookingId}/complete`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    });
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to complete trip');
+      throw new Error(data.message || "Failed to complete trip");
     }
 
     // Update earnings
     const booking = await loadBookingDetails(currentBookingId);
 
-    showNotification('Trip completed! Thank you!', 'success');
+    showNotification("Trip completed! Thank you!", "success");
     setTimeout(() => {
       clearBooking();
     }, 2000);
-
   } catch (error) {
-    console.error('Complete trip error:', error);
-    showNotification(error.message, 'error');
+    console.error("Complete trip error:", error);
+    showNotification(error.message, "error");
   }
 }
 
@@ -473,27 +491,27 @@ async function handleCompleteTrip() {
  * Handle trip started event
  */
 function onTripStarted(data) {
-  console.log('Trip started:', data);
-  startTripBtn.classList.add('hidden');
-  completeTripBtn.classList.remove('hidden');
+  console.log("Trip started:", data);
+  startTripBtn.classList.add("hidden");
+  completeTripBtn.classList.remove("hidden");
 }
 
 /**
  * Handle trip completed event
  */
 function onTripCompleted(data) {
-  console.log('Trip completed:', data);
+  console.log("Trip completed:", data);
   todaysTripsCount++;
   todaysTripsEl.textContent = todaysTripsCount;
 
-  const fareEl = document.getElementById('tripFare');
+  const fareEl = document.getElementById("tripFare");
   if (fareEl && fareEl.textContent) {
-    const fare = parseInt(fareEl.textContent.replace('₹', '')) || 0;
+    const fare = parseInt(fareEl.textContent.replace("₹", "")) || 0;
     todaysEarnings += fare;
     todaysEarningsEl.textContent = `₹${todaysEarnings}`;
   }
 
-  showNotification('Trip completed!', 'success');
+  showNotification("Trip completed!", "success");
   clearBooking();
 }
 
@@ -502,7 +520,7 @@ function onTripCompleted(data) {
  */
 async function handleUpdateLocation() {
   if (!navigator.geolocation) {
-    showNotification('Geolocation not supported', 'error');
+    showNotification("Geolocation not supported", "error");
     return;
   }
 
@@ -514,34 +532,38 @@ async function handleUpdateLocation() {
         const token = getAuthToken();
 
         const response = await fetch(`${API_BASE}/driver-status/location`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             latitude: latitude,
-            longitude: longitude
-          })
+            longitude: longitude,
+          }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || 'Failed to update location');
+          throw new Error(data.message || "Failed to update location");
         }
 
-        document.getElementById('currentLocation').textContent = `Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-        document.getElementById('locationStatus').textContent = 'Location updated ✓';
-        showNotification('Location updated', 'success');
-
+        document.getElementById(
+          "currentLocation"
+        ).textContent = `Location: ${latitude.toFixed(4)}, ${longitude.toFixed(
+          4
+        )}`;
+        document.getElementById("locationStatus").textContent =
+          "Location updated ✓";
+        showNotification("Location updated", "success");
       } catch (error) {
-        console.error('Location update error:', error);
-        showNotification(error.message, 'error');
+        console.error("Location update error:", error);
+        showNotification(error.message, "error");
       }
     },
     (error) => {
-      showNotification('Failed to get location: ' + error.message, 'error');
+      showNotification("Failed to get location: " + error.message, "error");
     }
   );
 }
@@ -553,30 +575,32 @@ async function loadChatHistory(bookingId) {
   try {
     const token = getAuthToken();
 
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/messages?limit=50`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const response = await fetch(
+      `${API_BASE}/bookings/${bookingId}/messages?limit=50`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    });
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to load messages');
+      throw new Error(data.message || "Failed to load messages");
     }
 
-    chatMessages.innerHTML = '';
+    chatMessages.innerHTML = "";
 
-    data.data.messages.forEach(msg => {
+    data.data.messages.forEach((msg) => {
       addMessageToChat({
         sender_role: msg.sender_role,
         message_text: msg.message_text,
-        created_at: msg.created_at
+        created_at: msg.created_at,
       });
     });
-
   } catch (error) {
-    console.error('Load chat error:', error);
+    console.error("Load chat error:", error);
   }
 }
 
@@ -593,34 +617,36 @@ async function handleSendMessage() {
   try {
     const token = getAuthToken();
 
-    const response = await fetch(`${API_BASE}/bookings/${currentBookingId}/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        message: message
-      })
-    });
+    const response = await fetch(
+      `${API_BASE}/bookings/${currentBookingId}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: message,
+        }),
+      }
+    );
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to send message');
+      throw new Error(data.message || "Failed to send message");
     }
 
     addMessageToChat({
-      sender_role: 'driver',
+      sender_role: "driver",
       message_text: message,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     });
 
-    chatInput.value = '';
-
+    chatInput.value = "";
   } catch (error) {
-    console.error('Send message error:', error);
-    showNotification(error.message, 'error');
+    console.error("Send message error:", error);
+    showNotification(error.message, "error");
   }
 }
 
@@ -628,11 +654,11 @@ async function handleSendMessage() {
  * Handle new message
  */
 function onNewMessage(data) {
-  console.log('New message:', data);
+  console.log("New message:", data);
   addMessageToChat({
     sender_role: data.sender_role,
     message_text: data.message_text,
-    created_at: data.created_at
+    created_at: data.created_at,
   });
 }
 
@@ -640,7 +666,7 @@ function onNewMessage(data) {
  * Add message to chat UI
  */
 function addMessageToChat(message) {
-  const msgEl = document.createElement('div');
+  const msgEl = document.createElement("div");
   msgEl.className = `chat-message ${message.sender_role}`;
 
   const time = new Date(message.created_at).toLocaleTimeString();
@@ -661,12 +687,12 @@ function switchTab(e) {
   const tabName = e.target.dataset.tab;
 
   // Update buttons
-  tabButtons.forEach(btn => btn.classList.remove('active'));
-  e.target.classList.add('active');
+  tabButtons.forEach((btn) => btn.classList.remove("active"));
+  e.target.classList.add("active");
 
   // Update content
-  tabContents.forEach(content => content.classList.remove('active'));
-  document.getElementById(tabName + 'Tab').classList.add('active');
+  tabContents.forEach((content) => content.classList.remove("active"));
+  document.getElementById(tabName + "Tab").classList.add("active");
 }
 
 /**
@@ -680,10 +706,10 @@ function clearBooking() {
       <p>No active booking</p>
     </div>
   `;
-  chatMessages.innerHTML = '';
-  chatInput.value = '';
-  startTripBtn.classList.add('hidden');
-  completeTripBtn.classList.add('hidden');
+  chatMessages.innerHTML = "";
+  chatInput.value = "";
+  startTripBtn.classList.add("hidden");
+  completeTripBtn.classList.add("hidden");
 }
 
 /**
@@ -701,7 +727,7 @@ function clearRequests() {
 /**
  * Show notification
  */
-function showNotification(message, type = 'info') {
+function showNotification(message, type = "info") {
   console.log(`[${type.toUpperCase()}] ${message}`);
 }
 
@@ -709,9 +735,9 @@ function showNotification(message, type = 'info') {
  * Get auth token
  */
 function getAuthToken() {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   if (!token) {
-    throw new Error('Not authenticated');
+    throw new Error("Not authenticated");
   }
   return token;
 }
