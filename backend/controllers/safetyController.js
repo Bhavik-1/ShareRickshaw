@@ -1,6 +1,8 @@
 const db = require('../config/database');
 const emailService = require('../services/emailService');
 
+console.log('Safety controller: Loading...');
+
 // In-memory store for SOS cooldown tracking (in production, use Redis)
 const sosCooldowns = new Map();
 
