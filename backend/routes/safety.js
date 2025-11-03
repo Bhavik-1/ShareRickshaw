@@ -2,7 +2,15 @@ const express = require('express');
 const { triggerSOS, getSOSStatus, getSOSLogs, testEmailService } = require('../controllers/safetyController');
 const authMiddleware = require('../middleware/auth');
 
+console.log('Safety routes: Loading...');
+
 const router = express.Router();
+
+// Test route to verify safety routes are loaded
+router.get('/test', (req, res) => {
+  console.log('Safety routes: Test endpoint accessed');
+  res.json({ success: true, message: 'Safety routes are working' });
+});
 
 // Apply authentication middleware to all safety routes
 router.use(authMiddleware);
