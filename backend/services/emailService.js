@@ -273,7 +273,10 @@ class EmailService {
     const results = [];
 
     for (const contact of contacts) {
+      console.log(`Processing contact: ${contact.contact_name}, Email: ${contact.contact_email}`);
+
       if (!contact.contact_email) {
+        console.log(`Skipping contact ${contact.contact_name} - no email`);
         results.push({
           success: false,
           error: 'No email address provided',
