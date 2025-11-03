@@ -39,10 +39,11 @@ function updateNavBar() {
   const userData = getUserData();
   const userRole = userData?.role; // 'user' or 'autowala'
 
-  if (userRole === 'autowala') {
+  if (userRole === "autowala") {
     // Show driver navigation
     const driverNav = `
       <li><a href="driver-dashboard.html">🚗 Dashboard</a></li>
+      <li><a href="autowala-profile.html">👤 Profile</a></li>
       <li><a href="#" onclick="logout(); return false;" style="color: #d32f2f;">🚪 Logout</a></li>
     `;
 
@@ -51,7 +52,7 @@ function updateNavBar() {
     if (mobileNavLinks) {
       mobileNavLinks.innerHTML = driverNav;
     }
-  } else if (userRole === 'user') {
+  } else if (userRole === "user") {
     // Show user navigation with all user features
     const userNav = `
       <li><a href="index.html">🏠 Home</a></li>
