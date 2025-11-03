@@ -290,6 +290,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     saveContactBtn.addEventListener("click", async () => {
       const name = contactNameInput.value.trim();
       const phone = contactPhoneInput.value.trim();
+      const email = contactEmailInput.value.trim();
 
       // Validate
       if (name.length < 2 || name.length > 100) {
@@ -302,6 +303,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       const phoneRegex = /^\d{10}$/;
       if (!phoneRegex.test(phone)) {
         errorMsg.textContent = "Contact phone must be exactly 10 digits";
+        errorMsg.classList.add("show");
+        setTimeout(() => errorMsg.classList.remove("show"), 5000);
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        errorMsg.textContent = "Please enter a valid email address";
         errorMsg.classList.add("show");
         setTimeout(() => errorMsg.classList.remove("show"), 5000);
         return;
