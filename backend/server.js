@@ -78,6 +78,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/stands', standsRoutes);
 app.use('/api/routes', routesRoutes);
 app.use('/api/bookings', bookingsRoutes);
+app.use('/api/safety', safetyRoutes);
 
 // Driver status routes
 const bookingsCtrl = require('./controllers/bookingsController');
