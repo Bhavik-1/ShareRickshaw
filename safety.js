@@ -96,6 +96,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function triggerEmergencyAlert() {
+        console.log('SOS: Starting emergency alert process');
+
         // Hide any previous messages
         sosSuccess.classList.add('hidden');
         sosError.classList.add('hidden');
@@ -105,8 +107,16 @@ document.addEventListener('DOMContentLoaded', function() {
         sosButton.textContent = 'Sending Alert...';
 
         try {
+            // Check if locationService is available
+            if (typeof locationService === 'undefined') {
+                console.error('SOS: locationService is not defined');
+                throw new Error('Location service not available');
+            }
+
             // Get current location using location service
+            console.log('SOS: Getting current location...');
             const location = await locationService.captureSOSLocation();
+            console.log('SOS: Location captured:', location);
 
             // Send SOS alert to backend
             const response = await fetch(`${API_BASE_URL}/sos/trigger`, {
