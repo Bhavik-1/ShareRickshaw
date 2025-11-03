@@ -174,5 +174,11 @@
     <script src="script.js"></script>
     <script src="safety.js"></script>
     <script src="js/auth.js"></script>
+    <script>
+    // Check authentication immediately
+    if (!window.isLoggedIn()) {
+      window.location.href = 'login.html';
+    }
+    </script>
 </body>
 </html>
