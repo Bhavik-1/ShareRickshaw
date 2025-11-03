@@ -7,14 +7,21 @@ let map;
 let markers = {};
 let standsData = [];
 
-// --- FIX: Leaflet default icon path issue (Moved outside DOMContentLoaded) ---
-// This ensures the icon paths are fixed immediately after the Leaflet library loads.
+// --- FIX: Leaflet default icon path issue + custom small red icon ---
 if (typeof L !== "undefined") {
+  // Fix Leaflet marker icon paths and use red small marker globally
+  delete L.Icon.Default.prototype._getIconUrl;
+
   L.Icon.Default.mergeOptions({
     iconRetinaUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+    iconUrl:
+      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [18, 30], // smaller size
+    iconAnchor: [9, 30], // adjust anchor point
+    popupAnchor: [1, -25],
+    shadowSize: [30, 30],
   });
 }
 // ------------------------------------------
