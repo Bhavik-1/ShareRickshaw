@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver Profile - Mumbai Share Auto</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .profile-container {
+        max-width: 800px;
+        margin: 80px auto 40px;
+        padding: 20px;
+      }
+
+      .profile-heading {
+        font-size: 2rem;
+        margin-bottom: 30px;
+        color: #1a1a1a;
+      }
+
+      .profile-section {
+        background: #fff;
+        border-radius: 8px;
+        padding: 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #2196f3;
+      }
+
+      .profile-field {
+        margin-bottom: 20px;
+      }
+
+      .profile-field label {
+        display: block;
+        font-weight: 500;
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+      }
+
+      .profile-field input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+
+      .profile-field input:disabled {
+        background: #f5f5f5;
+        color: #666;
+        cursor: not-allowed;
+      }
+
+      .profile-field input:focus:not(:disabled) {
+        outline: none;
+        border-color: #2196f3;
+      }
+
+      .profile-field .value-display {
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 6px;
+        font-size: 1rem;
+        color: #333;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .btn-primary {
+        padding: 12px 30px;
+        background: #2196f3;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: #1976d2;
+      }
+
+      .btn-primary:disabled {
+        background: #90caf9;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        padding: 12px 30px;
+        background: #fff;
+        color: #2196f3;
+        border: 2px solid #2196f3;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-secondary:hover {
+        background: #e3f2fd;
+      }
+
+      .success-message,
+      .error-message {
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .success-message {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      .error-message {
+        background: #ffebee;
+        color: #d32f2f;
+      }
+
+      .success-message.show,
+      .error-message.show {
+        display: block;
+      }
+
+      /* Responsive styles (omitted for brevity) */
+      @media (max-width: 768px) {
+        .profile-container {
+          margin: 40px 20px;
+        }
+
+        .profile-heading {
+          font-size: 1.5rem;
+        }
+
+        .profile-section {
+          padding: 20px;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-brand">🛺 Mumbai Share Auto</div>
+        <ul class="nav-links" id="nav-links"></ul>
+        <button class="hamburger" aria-label="Open navigation menu">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="mobile-menu-backdrop"></div>
+    <div class="mobile-menu" aria-hidden="true">
+      <button class="mobile-menu-close" aria-label="Close navigation menu">
+        &times;
+      </button>
+      <ul class="mobile-nav-links" id="mobile-nav-links"></ul>
+    </div>
+
+    <div class="profile-container">
+      <h1 class="profile-heading">My Driver Profile</h1>
+
+      <div id="autowala-profile-section" class="profile-section">
+        <h2 class="section-title">Driver & Auto Details</h2>
+
+        <div id="autowala-profile-success" class="success-message"></div>
+        <div id="autowala-profile-error" class="error-message"></div>
+
+        <div class="profile-field">
+          <label>Email</label>
+          <div class="value-display" id="autowala-email"></div>
+        </div>
+
+        <div class="profile-field">
+          <label>Driver Name</label>
+          <input
+            type="text"
+            id="autowala-driver-name"
+            placeholder="Driver name"
+          />
+        </div>
+
+        <div class="profile-field">
+          <label>Phone Number</label>
+          <input
+            type="tel"
+            id="autowala-phone"
+            maxlength="10"
+            placeholder="Driver contact number"
+          />
+        </div>
+
+        <div class="profile-field">
+          <label>Operating Location</label>
+          <input
+            type="text"
+            id="autowala-location"
+            placeholder="Operating area/city"
+          />
+        </div>
+
+        <div class="profile-field">
+          <label>License Plate Number</label>
+          <div class="value-display" id="autowala-license-plate"></div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn-primary" id="update-autowala-profile">
+            Update Profile
+          </button>
+        </div>
+      </div>
+
+      <div id="user-profile-section" class="profile-section hidden"></div>
+      <div id="emergency-contacts-section" class="profile-section hidden"></div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-left">
+          <p class="footer-copyright">
+            &copy; 2024 Mumbai Share Auto Finder. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/profile.js"></script>
+    <script>
+      // Check authentication and role immediately for this dedicated page
+      if (!window.isLoggedIn()) {
+        window.location.href = "login.html";
+      } else {
+        const userData = window.getUserData();
+        // Redirect non-autowalas to the general profile page
+        if (userData.role !== "autowala") {
+          window.location.href = "profile.html";
+        }
+      }
+    </script>
+  </body>
+</html>
