@@ -283,6 +283,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       showFormBtn.style.display = "block";
       contactNameInput.value = "";
       contactPhoneInput.value = "";
+      contactEmailInput.value = "";
     });
 
     // Save contact
