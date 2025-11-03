@@ -355,6 +355,14 @@ class LocationService {
       // Create formatted location object
       const location = this.createLocationObject(rawLocation);
 
+      // Log final accuracy
+      console.log('LocationService: Final location accuracy:', location.accuracy, 'meters');
+
+      // Show user-friendly accuracy warning if needed
+      if (location.accuracy > 1000) {
+        console.warn('LocationService: Warning - Location accuracy is poor:', this.getAccuracyDescription(location.accuracy));
+      }
+
       // Try to get address (non-blocking, don't fail if geocoding fails)
       this.reverseGeocode(rawLocation.latitude, rawLocation.longitude)
         .then(address => {
