@@ -269,6 +269,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const contactNameInput = document.getElementById("new-contact-name");
     const contactPhoneInput = document.getElementById("new-contact-phone");
     const contactEmailInput = document.getElementById("new-contact-email");
+  console.log('Email input element found:', contactEmailInput);
     const successMsg = document.getElementById("contacts-success");
     const errorMsg = document.getElementById("contacts-error");
 
