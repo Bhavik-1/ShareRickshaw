@@ -1,6 +1,6 @@
 const express = require('express');
 const { triggerSOS, getSOSStatus, getSOSLogs, testEmailService } = require('../controllers/safetyController');
-const { authMiddleware } = require('../middleware/auth');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
