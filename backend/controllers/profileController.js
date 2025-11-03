@@ -293,6 +293,7 @@ exports.addEmergencyContact = async (req, res) => {
     // Trim inputs
     const trimmedName = contact_name.trim();
     const trimmedPhone = contact_phone.trim();
+    const trimmedEmail = contact_email.trim().toLowerCase();
 
     // Validate contact name length
     if (trimmedName.length < 2 || trimmedName.length > 100) {
@@ -311,10 +312,32 @@ exports.addEmergencyContact = async (req, res) => {
       });
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format'
+      });
+    }
+
+    // Check for duplicate email within user's contacts
+    const [existingContacts] = await db.query(
+      'SELECT id FROM emergency_contacts WHERE user_id = ? AND contact_email = ?',
+      [userId, trimmedEmail]
+    );
+
+    if (existingContacts.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'A contact with this email already exists'
+      });
+    }
+
     // Insert into emergency_contacts table
     const [result] = await db.query(
-      'INSERT INTO emergency_contacts (user_id, contact_name, contact_phone, created_at) VALUES (?, ?, ?, NOW())',
-      [userId, trimmedName, trimmedPhone]
+      'INSERT INTO emergency_contacts (user_id, contact_name, contact_phone, contact_email, created_at) VALUES (?, ?, ?, ?, NOW())',
+      [userId, trimmedName, trimmedPhone, trimmedEmail]
     );
 
     res.status(201).json({
