@@ -24,7 +24,7 @@ exports.getProfile = async (req, res) => {
     // If role is 'user', fetch emergency contacts
     if (user.role === 'user') {
       const [emergencyContacts] = await db.query(
-        'SELECT id, contact_name, contact_phone FROM emergency_contacts WHERE user_id = ? ORDER BY created_at ASC',
+        'SELECT id, contact_name, contact_phone, contact_email FROM emergency_contacts WHERE user_id = ? ORDER BY created_at ASC',
         [userId]
       );
 
