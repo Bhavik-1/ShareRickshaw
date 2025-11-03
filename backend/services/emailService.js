@@ -265,6 +265,11 @@ class EmailService {
 
   // Send emergency alerts to multiple contacts with retry logic
   async sendEmergencyAlertsToMultipleContacts(contacts, userName, location, maxRetries = 3) {
+    console.log('=== Sending Emergency Alerts ===');
+    console.log('Total contacts:', contacts.length);
+    console.log('Email service ready:', this.isServiceReady());
+    console.log('Gmail credentials configured:', !!(process.env.GMAIL_EMAIL && process.env.GMAIL_APP_PASSWORD));
+
     const results = [];
 
     for (const contact of contacts) {
