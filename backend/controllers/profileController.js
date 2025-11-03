@@ -346,7 +346,8 @@ exports.addEmergencyContact = async (req, res) => {
       contact: {
         id: result.insertId,
         contact_name: trimmedName,
-        contact_phone: trimmedPhone
+        contact_phone: trimmedPhone,
+        contact_email: trimmedEmail
       }
     });
 
