@@ -299,8 +299,8 @@ function cleanupCooldowns() {
 setInterval(cleanupCooldowns, 10 * 60 * 1000);
 
 module.exports = {
-  triggerSOS,
-  getSOSStatus,
-  getSOSLogs,
-  testEmailService
+  triggerSOS: exports.triggerSOS,
+  getSOSStatus: exports.getSOSStatus,
+  getSOSLogs: exports.getSOSLogs,
+  testEmailService: exports.testEmailService
 };
