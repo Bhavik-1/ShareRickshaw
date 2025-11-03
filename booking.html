@@ -204,5 +204,17 @@
   <script src="js/auth.js"></script>
   <script src="js/booking.js"></script>
   <script src="js/bookingSocket.js"></script>
+  <script>
+  // Check authentication and user role immediately
+  if (!window.isLoggedIn()) {
+    window.location.href = 'login.html';
+  } else {
+    // Check if user is regular user (not autowala)
+    const userData = window.getUserData();
+    if (!userData || userData.role !== 'user') {
+      window.location.href = 'index.html';
+    }
+  }
+  </script>
 </body>
 </html>
