@@ -1,5 +1,12 @@
 const express = require('express');
 const { triggerSOS, getSOSStatus, getSOSLogs, testEmailService } = require('../controllers/safetyController');
+
+console.log('Safety routes: Controller loaded, functions:', {
+  triggerSOS: typeof triggerSOS,
+  getSOSStatus: typeof getSOSStatus,
+  getSOSLogs: typeof getSOSLogs,
+  testEmailService: typeof testEmailService
+});
 const authMiddleware = require('../middleware/auth');
 
 console.log('Safety routes: Loading...');
