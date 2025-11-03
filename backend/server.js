@@ -97,6 +97,7 @@ app.get('/', (req, res) => {
       stands: '/api/stands',
       routes: '/api/routes',
       bookings: '/api/bookings',
+      safety: '/api/safety',
       driverStatus: '/api/driver-status'
     }
   });
