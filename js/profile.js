@@ -297,14 +297,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Save contact
     saveContactBtn.addEventListener("click", async () => {
-      console.log('contactEmailInput element:', contactEmailInput);
-      console.log('email field value:', contactEmailInput?.value);
-
       const name = contactNameInput.value.trim();
       const phone = contactPhoneInput.value.trim();
-      const email = contactEmailInput ? contactEmailInput.value.trim() : '';
-
-      console.log('Values being sent:', { name, phone, email });
+      const email = contactEmailInput.value.trim();
 
       // Validate
       if (name.length < 2 || name.length > 100) {
