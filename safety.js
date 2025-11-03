@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('SOS: Location captured:', location);
 
             // Send SOS alert to backend
-            const response = await fetch(`${API_BASE_URL}/sos/trigger`, {
+            const response = await fetch(`${API_BASE_URL}/safety/sos/trigger`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
