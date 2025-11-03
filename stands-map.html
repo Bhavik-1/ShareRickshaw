@@ -292,6 +292,105 @@
           height: 48px;
           font-size: 16px;
         }
+
+        /* --- Clean, Compact, Evenly Aligned Popup --- */
+        .stand-popup {
+          padding: 12px 14px;
+          max-width: 260px;
+          line-height: 1.3;
+          font-family: "Inter", sans-serif;
+        }
+
+        .popup-title {
+          font-size: 15px;
+          font-weight: 700;
+          color: #222;
+          margin-bottom: 4px;
+        }
+
+        .popup-hours {
+          font-size: 13px;
+          color: #666;
+          margin-bottom: 10px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .popup-hours::before {
+          content: "⏰";
+          font-size: 14px;
+        }
+
+        .popup-routes-heading {
+          font-size: 13px;
+          font-weight: 600;
+          color: #1976d2;
+          margin-bottom: 6px;
+          border-bottom: 1px solid #eee;
+          padding-bottom: 3px;
+        }
+
+        /* Routes List */
+        .popup-routes-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          max-height: 160px;
+          overflow-y: auto;
+        }
+
+        .popup-route-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 6px 0;
+          border-bottom: 1px solid #f1f1f1;
+          cursor: pointer; /* 👈 Add this line */
+          transition: background 0.15s, transform 0.1s ease-in-out;
+        }
+
+        .popup-route-item:hover {
+          background: #f7f9fc;
+          transform: scale(1.01); /* 👈 Optional for subtle "clickable" feel */
+        }
+
+        .popup-route-left {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .popup-route-left span {
+          font-size: 13px;
+          font-weight: 500;
+          color: #333;
+          white-space: nowrap;
+        }
+
+        .popup-route-left .icon {
+          font-size: 14px;
+        }
+
+        .popup-route-details {
+          font-size: 12px;
+          color: #00897b;
+          white-space: nowrap;
+          flex-shrink: 0;
+          font-weight: 600;
+        }
+
+        .popup-more-routes {
+          font-size: 12px;
+          color: #999;
+          font-style: italic;
+          margin-top: 6px;
+          text-align: right;
+        }
+        .leaflet-popup-content-wrapper {
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
       }
     </style>
   </head>
