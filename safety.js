@@ -95,23 +95,62 @@ document.addEventListener('DOMContentLoaded', function() {
         sosModal.classList.remove('show');
     }
 
-    function triggerEmergencyAlert() {
+    async function triggerEmergencyAlert() {
         // Hide any previous messages
         sosSuccess.classList.add('hidden');
         sosError.classList.add('hidden');
 
-        // Fetch current location
-        getCurrentLocation(
-            function(lat, lng) {
-                // Success: Display location and success message
-                displaySOSLocation(lat, lng);
+        // Show loading state
+        sosButton.disabled = true;
+        sosButton.textContent = 'Sending Alert...';
+
+        try {
+            // Get current location using location service
+            const location = await locationService.captureSOSLocation();
+
+            // Send SOS alert to backend
+            const response = await fetch(`${API_BASE_URL}/sos/trigger`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify({
+                    location: {
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        accuracy: location.accuracy
+                    }
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Success: Show detailed success message
+                displaySOSSuccess(data);
                 sosSuccess.classList.remove('hidden');
-            },
-            function(errorMessage) {
-                // Error: Show error message
-                showSOSError(errorMessage);
+            } else {
+                // Handle specific error cases
+                handleSOSError(data);
+                sosError.classList.remove('hidden');
             }
-        );
+
+        } catch (error) {
+            console.error('SOS trigger error:', error);
+
+            // Check if it's a location error
+            if (error.message.includes('Location') || error.message.includes('GPS')) {
+                showSOSError('Unable to get your location. Please enable location services and try again.');
+            } else {
+                showSOSError('Failed to send emergency alert. Please try again.');
+            }
+            sosError.classList.remove('hidden');
+        } finally {
+            // Reset button state
+            sosButton.disabled = false;
+            sosButton.textContent = 'SOS';
+        }
     }
 
     function displaySOSLocation(lat, lng) {
