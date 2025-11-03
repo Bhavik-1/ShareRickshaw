@@ -332,6 +332,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             body: JSON.stringify({
               contact_name: name,
               contact_phone: phone,
+              contact_email: email,
             }),
           }
         );
