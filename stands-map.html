@@ -9,7 +9,6 @@
     />
     <title>Share Auto Stands Map - Mumbai Share Auto</title>
 
-    <!-- Leaflet.js CSS -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -17,10 +16,13 @@
       crossorigin=""
     />
 
-    <!-- Existing site styles -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+    />
+
     <link rel="stylesheet" href="styles.css" />
 
-    <!-- Map-specific styles -->
     <style>
       /* Map page layout */
       .map-page {
@@ -391,16 +393,17 @@
           border-radius: 10px;
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
+        .leaflet-routing-container .leaflet-routing-summary {
+          display: none !important;
+        }
       }
     </style>
   </head>
   <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
       <div class="nav-container">
         <div class="nav-brand">🛺 Mumbai Share Auto</div>
 
-        <!-- Desktop Navigation -->
         <ul class="nav-links" id="nav-links">
           <li><a href="index.html">Home</a></li>
           <li><a href="fare-calculator.html">Fare Calculator</a></li>
@@ -409,7 +412,6 @@
           <li><a href="safety.html">Safety</a></li>
         </ul>
 
-        <!-- Hamburger Menu Icon -->
         <button class="hamburger" aria-label="Open navigation menu">
           <span class="hamburger-line"></span>
           <span class="hamburger-line"></span>
@@ -418,7 +420,6 @@
       </div>
     </nav>
 
-    <!-- Mobile Menu -->
     <div class="mobile-menu-backdrop"></div>
     <div class="mobile-menu" aria-hidden="true">
       <button class="mobile-menu-close" aria-label="Close navigation menu">
@@ -433,15 +434,12 @@
       </ul>
     </div>
 
-    <!-- Main Content -->
     <main class="map-page">
-      <!-- Page Header Section -->
       <section class="page-header">
         <h1>Share Auto Stands Map</h1>
         <p class="subtitle">Explore 10 major share auto stands across Mumbai</p>
       </section>
 
-      <!-- Search Section -->
       <section class="search-section">
         <input
           type="text"
@@ -450,7 +448,6 @@
         />
       </section>
 
-      <!-- Map Container -->
       <section class="map-container">
         <div id="loading-spinner" class="spinner-overlay">
           <div class="spinner"></div>
@@ -459,19 +456,15 @@
         <div id="map"></div>
       </section>
 
-      <!-- Stands List Section -->
       <section class="stands-list-section">
         <h2 id="stands-heading">All Stands</h2>
-        <div id="stands-grid" class="stands-grid">
-          <!-- Stand cards will be dynamically inserted here -->
-        </div>
+        <div id="stands-grid" class="stands-grid"></div>
         <div id="no-results" class="no-results" style="display: none">
           <p>No stands or routes found matching your search.</p>
         </div>
       </section>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
       <div class="footer-container">
         <div class="footer-left">
@@ -495,7 +488,6 @@
       </div>
     </footer>
 
-    <!-- Leaflet.js library -->
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -505,6 +497,8 @@
     <script src="script.js"></script>
 
     <script src="js/auth.js"></script>
+
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
     <script src="map.js"></script>
   </body>
