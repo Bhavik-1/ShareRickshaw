@@ -14,6 +14,7 @@ const profileRoutes = require('./routes/profile');
 const standsRoutes = require('./routes/stands');
 const routesRoutes = require('./routes/routes');
 const bookingsRoutes = require('./routes/bookings');
+const safetyRoutes = require('./routes/safety');
 
 // Import middleware and services
 const socketAuth = require('./middleware/socketAuth');
