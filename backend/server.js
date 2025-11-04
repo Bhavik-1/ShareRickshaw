@@ -1,30 +1,30 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const http = require('http');
-const socketIo = require('socket.io');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+// const bodyParser = require('body-parser'); // Body-parser is included in Express now
+const http = require("http");
+const socketIo = require("socket.io");
+require("dotenv").config();
 
 // Import database connection (establishes connection on load)
-require('./config/database');
+require("./config/database");
 
 // Import route modules
-const authRoutes = require('./routes/auth');
-const profileRoutes = require('./routes/profile');
-const standsRoutes = require('./routes/stands');
-const routesRoutes = require('./routes/routes');
-const bookingsRoutes = require('./routes/bookings');
-console.log('Server: Loading safety routes...');
-const safetyRoutes = require('./routes/safety');
-console.log('Server: Safety routes loaded:', typeof safetyRoutes);
+const authRoutes = require("./routes/auth");
+const profileRoutes = require("./routes/profile");
+const standsRoutes = require("./routes/stands");
+const routesRoutes = require("./routes/routes");
+const bookingsRoutes = require("./routes/bookings");
+console.log("Server: Loading safety routes...");
+const safetyRoutes = require("./routes/safety");
+console.log("Server: Safety routes loaded:", typeof safetyRoutes);
 
 // Import middleware and services
-const socketAuth = require('./middleware/socketAuth');
+const socketAuth = require("./middleware/socketAuth");
 const {
   setIoInstance,
   registerUserSocket,
-  unregisterUserSocket
-} = require('./services/socketEmitter');
+  unregisterUserSocket,
+} = require("./services/socketEmitter");
 
 // Initialize Express app
 const app = express();
@@ -35,21 +35,36 @@ const server = http.createServer(app);
 // Initialize socket.io
 const io = socketIo(server, {
   cors: {
-    origin: ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost:5500'],
-    credentials: true
-  }
+    origin: [
+      "http://localhost:8000",
+      "http://127.0.0.1:8000",
+      "http://localhost:5500",
+    ],
+    credentials: true,
+  },
 });
 
 // Set io instance in socketEmitter service
 setIoInstance(io);
 
 // Middleware
-app.use(cors({
-  origin: ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost:5500'],
-  credentials: true
-}));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:8000",
+      "http://127.0.0.1:8000",
+      "http://localhost:5500",
+    ],
+    credentials: true,
+  })
+);
+
+// FIX: Increase JSON body limit to handle large base64 image data
+app.use(express.json({ limit: "5mb" })); // Allow up to 5MB JSON payload (base64 image)
+
+// The old body-parser logic below is now handled by express.json above,
+// but keeping the urlencoded line if it was used for other forms
+app.use(express.urlencoded({ extended: true }));
 
 // Request logging (development)
 app.use((req, res, next) => {
@@ -60,7 +75,7 @@ app.use((req, res, next) => {
 // WebSocket connection handling
 io.use(socketAuth);
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   const userId = socket.userId;
   const userRole = socket.userRole;
   console.log(`User ${userId} (${userRole}) connected via WebSocket`);
@@ -68,40 +83,48 @@ io.on('connection', (socket) => {
   // Register user socket
   registerUserSocket(userId, socket);
 
-  socket.on('disconnect', () => {
+  socket.on("disconnect", () => {
     console.log(`User ${userId} disconnected from WebSocket`);
     unregisterUserSocket(userId, socket.id);
   });
 });
 
 // API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/stands', standsRoutes);
-app.use('/api/routes', routesRoutes);
-app.use('/api/bookings', bookingsRoutes);
-app.use('/api/safety', safetyRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/stands", standsRoutes);
+app.use("/api/routes", routesRoutes);
+app.use("/api/bookings", bookingsRoutes);
+app.use("/api/safety", safetyRoutes);
 
 // Driver status routes
-const bookingsCtrl = require('./controllers/bookingsController');
-const authMiddleware = require('./middleware/auth');
-app.post('/api/driver-status/update', authMiddleware, bookingsCtrl.updateDriverStatus);
-app.post('/api/driver-status/location', authMiddleware, bookingsCtrl.updateDriverLocation);
+const bookingsCtrl = require("./controllers/bookingsController");
+const authMiddleware = require("./middleware/auth");
+app.post(
+  "/api/driver-status/update",
+  authMiddleware,
+  bookingsCtrl.updateDriverStatus
+);
+app.post(
+  "/api/driver-status/location",
+  authMiddleware,
+  bookingsCtrl.updateDriverLocation
+);
 
 // Root endpoint
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.json({
-    message: 'Mumbai Share Auto API',
-    version: '1.0.0',
+    message: "Mumbai Share Auto API",
+    version: "1.0.0",
     endpoints: {
-      auth: '/api/auth',
-      profile: '/api/profile',
-      stands: '/api/stands',
-      routes: '/api/routes',
-      bookings: '/api/bookings',
-      safety: '/api/safety',
-      driverStatus: '/api/driver-status'
-    }
+      auth: "/api/auth",
+      profile: "/api/profile",
+      stands: "/api/stands",
+      routes: "/api/routes",
+      bookings: "/api/bookings",
+      safety: "/api/safety",
+      driverStatus: "/api/driver-status",
+    },
   });
 });
 
@@ -109,16 +132,16 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Endpoint not found'
+    message: "Endpoint not found",
   });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
+  console.error("Server error:", err);
   res.status(500).json({
     success: false,
-    message: 'Internal server error'
+    message: "Internal server error",
   });
 });
 
