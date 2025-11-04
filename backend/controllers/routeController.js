@@ -654,6 +654,134 @@ class RouteController {
   static isWithinMumbaiBounds(lat, lng) {
     return lat >= 18.8 && lat <= 19.3 && lng >= 72.7 && lng <= 73.0;
   }
+
+  static getMockRoutes(distance, startAddress, endAddress) {
+    // Generate realistic mock route data for testing when database is unavailable
+    const baseTime = Math.ceil(distance * 3); // 3 minutes per km average
+    const baseFare = Math.max(26, Math.ceil(26 + (distance - 1.5) * 17.14)); // Mumbai fare calculation
+
+    return {
+      routes: {
+        stand_routes: [
+          {
+            id: 'mock_stand_1',
+            type: 'stand_route',
+            title: 'Share Auto via Bandra Stand',
+            segments: [
+              {
+                mode: 'walk',
+                from: startAddress || 'Start Location',
+                to: 'Bandra Stand',
+                distance: 0.5,
+                time: 6
+              },
+              {
+                mode: 'auto',
+                from: 'Bandra Stand',
+                to: endAddress || 'Destination',
+                distance: distance - 0.5,
+                time: baseTime - 5,
+                fare: baseFare
+              }
+            ],
+            total_distance: distance,
+            total_time: baseTime + 1,
+            total_fare: baseFare,
+            confidence: 0.8
+          }
+        ],
+        hybrid_routes: [
+          {
+            id: 'mock_hybrid_1',
+            type: 'hybrid_route',
+            title: 'Hybrid Route (Multiple Stands)',
+            segments: [
+              {
+                mode: 'walk',
+                from: startAddress || 'Start Location',
+                to: 'Nearby Stand',
+                distance: 0.3,
+                time: 4
+              },
+              {
+                mode: 'auto',
+                from: 'Nearby Stand',
+                to: 'Midpoint Stand',
+                distance: distance / 2,
+                time: baseTime / 2,
+                fare: baseFare / 2
+              },
+              {
+                mode: 'walk',
+                from: 'Midpoint Stand',
+                to: endAddress || 'Destination',
+                distance: 0.3,
+                time: 4
+              }
+            ],
+            total_distance: distance,
+            total_time: baseTime + 8,
+            total_fare: baseFare / 2,
+            confidence: 0.6
+          }
+        ],
+        direct_auto: {
+          id: 'mock_direct_auto',
+          type: 'direct_auto',
+          title: 'Direct Auto',
+          segments: [
+            {
+              mode: 'auto',
+              from: startAddress || 'Start Location',
+              to: endAddress || 'Destination',
+              distance: distance,
+              time: baseTime + 3,
+              fare: baseFare + 20
+            }
+          ],
+          total_distance: distance,
+          total_time: baseTime + 3,
+          total_fare: baseFare + 20,
+          confidence: 0.9
+        },
+        train_route: {
+          id: 'mock_train_route',
+          type: 'train_route',
+          title: 'Train + Auto',
+          segments: [
+            {
+              mode: 'auto',
+              from: startAddress || 'Start Location',
+              to: 'Nearest Station',
+              distance: 1.0,
+              time: 8,
+              fare: 26
+            },
+            {
+              mode: 'train',
+              from: 'Nearest Station',
+              to: 'Destination Station',
+              distance: distance * 0.8,
+              time: Math.ceil(distance * 1.5),
+              fare: Math.ceil(distance * 5)
+            },
+            {
+              mode: 'auto',
+              from: 'Destination Station',
+              to: endAddress || 'Destination',
+              distance: 1.0,
+              time: 8,
+              fare: 26
+            }
+          ],
+          total_distance: distance + 0.6,
+          total_time: baseTime + 5,
+          total_fare: Math.ceil(distance * 5) + 52,
+          confidence: 0.7
+        }
+      }
+    };
+  }
 }
 
 module.exports = RouteController;
