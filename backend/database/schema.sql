@@ -203,3 +203,57 @@ CREATE TABLE IF NOT EXISTS sos_logs (
   INDEX idx_user_id (user_id),
   INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: train_stations
+-- Purpose: Store train station data for multi-modal route planning
+CREATE TABLE IF NOT EXISTS train_stations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  latitude DECIMAL(10,8) NOT NULL,
+  longitude DECIMAL(11,8) NOT NULL,
+  line VARCHAR(50) DEFAULT 'Western' NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  -- Constraints for Mumbai coordinates
+  CHECK (latitude BETWEEN 18.8 AND 19.3),
+  CHECK (longitude BETWEEN 72.7 AND 73.0),
+
+  -- Unique constraint for station name and line combination
+  UNIQUE KEY uk_station_line (name, line),
+
+  -- Index for faster lookups
+  INDEX idx_line (line),
+  INDEX idx_coordinates (latitude, longitude)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: stand_connections
+-- Purpose: Store direct connections between stands for hybrid routing
+CREATE TABLE IF NOT EXISTS stand_connections (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  from_stand_id INT NOT NULL,
+  to_stand_id INT NOT NULL,
+  distance_km DECIMAL(8,3) NOT NULL,
+  fare DECIMAL(6,2) NOT NULL,
+  travel_time_minutes INT NOT NULL,
+  connection_type ENUM('direct', 'via_road') DEFAULT 'direct' NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  -- Foreign key constraints
+  CONSTRAINT fk_from_stand
+    FOREIGN KEY (from_stand_id)
+    REFERENCES stands(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_to_stand
+    FOREIGN KEY (to_stand_id)
+    REFERENCES stands(id)
+    ON DELETE CASCADE,
+
+  -- Prevent duplicate connections in opposite directions
+  UNIQUE KEY uk_stand_connection (from_stand_id, to_stand_id),
+
+  -- Indexes for faster lookups
+  INDEX idx_from_stand (from_stand_id),
+  INDEX idx_to_stand (to_stand_id),
+  INDEX idx_distance (distance_km)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
