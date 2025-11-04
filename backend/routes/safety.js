@@ -6,6 +6,8 @@ const {
   testEmailService,
   captureAutoNumber,
   getAutoCaptureHistory,
+  sendNightLocationUpdate, // Import existing function
+  checkRecentAutoCapture, // Import new function
 } = require("../controllers/safetyController");
 
 console.log("Safety routes: Controller loaded, functions:", {
@@ -15,6 +17,8 @@ console.log("Safety routes: Controller loaded, functions:", {
   testEmailService: typeof testEmailService,
   captureAutoNumber: typeof captureAutoNumber,
   getAutoCaptureHistory: typeof getAutoCaptureHistory,
+  sendNightLocationUpdate: typeof sendNightLocationUpdate,
+  checkRecentAutoCapture: typeof checkRecentAutoCapture, // Check new function
 });
 const authMiddleware = require("../middleware/auth");
 
@@ -43,11 +47,18 @@ router.get("/sos/logs", getSOSLogs);
 // POST /api/safety/test-email - Test email service configuration
 router.post("/test-email", testEmailService);
 
-// NEW ROUTES FOR AUTO CAPTURE
+// AUTO CAPTURE ROUTES
 // POST /api/safety/capture-auto - Capture image, extract number plate, and save
 router.post("/capture-auto", captureAutoNumber);
 
 // GET /api/safety/capture-history - Get all previous captures for the user
 router.get("/capture-history", getAutoCaptureHistory);
+
+// NEW ROUTE FOR CHECKING RECENT CAPTURES
+// GET /api/safety/night-track/recent-capture - Check if a plate was captured in the last 3 hours
+router.get("/night-track/recent-capture", checkRecentAutoCapture);
+
+// POST /api/safety/night-track/update - Send live location update to contacts
+router.post("/night-track/update", sendNightLocationUpdate);
 
 module.exports = router;
