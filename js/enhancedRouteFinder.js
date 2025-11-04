@@ -247,6 +247,8 @@ class EnhancedRouteFinder {
 
   async reverseGeocode(lat, lng) {
     try {
+      console.log('Reverse geocoding:', { lat, lng });
+
       // Use Nominatim for reverse geocoding
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
@@ -262,7 +264,26 @@ class EnhancedRouteFinder {
       }
 
       const data = await response.json();
-      return data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      console.log('Geocoding response:', data);
+
+      // Extract meaningful location name
+      let address = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+      // If we have address components, create a shorter, more useful address
+      if (data.address) {
+        const parts = [];
+        if (data.address.road) parts.push(data.address.road);
+        if (data.address.suburb) parts.push(data.address.suburb);
+        if (data.address.neighbourhood) parts.push(data.address.neighbourhood);
+        if (data.address.city) parts.push(data.address.city);
+
+        if (parts.length > 0) {
+          address = parts.join(', ');
+        }
+      }
+
+      console.log('Final address:', address);
+      return address;
 
     } catch (error) {
       console.error('Reverse geocoding error:', error);
