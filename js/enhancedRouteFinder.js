@@ -309,7 +309,7 @@ class EnhancedRouteFinder {
       }
 
       // Call enhanced route API
-      const response = await fetch('/api/routes/calculate', {
+      const response = await fetch(`${window.API_BASE_URL}/routes/calculate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
