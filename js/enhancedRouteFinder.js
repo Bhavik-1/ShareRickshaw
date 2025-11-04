@@ -109,16 +109,26 @@ class EnhancedRouteFinder {
       }
 
       const position = await this.getCurrentPosition();
-      const { latitude, longitude } = position.coords;
+      const { latitude, longitude, accuracy } = position.coords;
+
+      console.log('Got location:', { latitude, longitude, accuracy });
+
+      // Check if location is within Mumbai bounds
+      if (!this.isWithinMumbaiBounds(latitude, longitude)) {
+        console.warn('Location may be outside Mumbai bounds');
+      }
 
       // Reverse geocode to get address
       const address = await this.reverseGeocode(latitude, longitude);
 
       const location = {
-        address: address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+        address: address || `Current Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
         latitude,
-        longitude
+        longitude,
+        accuracy
       };
+
+      console.log('Final location object:', location);
 
       if (type === 'start') {
         this.startLocation = location;
@@ -133,6 +143,7 @@ class EnhancedRouteFinder {
 
     } catch (error) {
       this.hideLoading();
+      console.error('Error getting current location:', error);
       this.showError(type, error.message);
     }
   }
