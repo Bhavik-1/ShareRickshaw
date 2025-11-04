@@ -48,22 +48,39 @@ class RouteController {
           RouteController.calculateTrainRoute(startLat, startLng, endLat, endLng)
         ]);
 
-      res.json({
-        success: true,
-        data: {
-          routes: {
-            stand_routes: standRoutes,
-            hybrid_routes: hybridRoutes,
-            direct_auto: directAutoRoute,
-            train_route: trainRoute
-          },
-          search_metadata: {
-            start_location: startAddress || `${startLat.toFixed(4)}, ${startLng.toFixed(4)}`,
-            end_location: endAddress || `${endLat.toFixed(4)}, ${endLng.toFixed(4)}`,
-            total_options: 4
+        res.json({
+          success: true,
+          data: {
+            routes: {
+              stand_routes: standRoutes,
+              hybrid_routes: hybridRoutes,
+              direct_auto: directAutoRoute,
+              train_route: trainRoute
+            },
+            search_metadata: {
+              start_location: startAddress || `${startLat.toFixed(4)}, ${startLng.toFixed(4)}`,
+              end_location: endAddress || `${endLat.toFixed(4)}, ${endLng.toFixed(4)}`,
+              total_options: 4
+            }
           }
-        }
-      });
+        });
+      } else {
+        // Return mock data when database is unavailable
+        const distance = RouteController.calculateDistance(startLat, startLng, endLat, endLng);
+        const mockData = RouteController.getMockRoutes(distance, startAddress, endAddress);
+
+        res.json({
+          success: true,
+          data: {
+            routes: mockData.routes,
+            search_metadata: {
+              start_location: startAddress || `${startLat.toFixed(4)}, ${startLng.toFixed(4)}`,
+              end_location: endAddress || `${endLat.toFixed(4)}, ${endLng.toFixed(4)}`,
+              total_options: 4
+            }
+          }
+        });
+      }
 
     } catch (error) {
       console.error('Error calculating multi-modal routes:', error);
