@@ -897,6 +897,11 @@ class EnhancedRouteFinder {
     this.clearError('start');
     this.clearError('end');
   }
+
+  isWithinMumbaiBounds(lat, lng) {
+    // Mumbai metropolitan area bounds (broader than city center)
+    return lat >= 18.5 && lat <= 19.8 && lng >= 72.5 && lng <= 73.2;
+  }
 }
 
 // Initialize the enhanced route finder when DOM is loaded
