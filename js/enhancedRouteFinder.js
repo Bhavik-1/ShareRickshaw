@@ -500,18 +500,27 @@ class EnhancedRouteFinder {
     const mapContainer = document.getElementById('mapContainer');
     mapContainer.style.display = 'block';
 
-    if (!this.mapInstance) {
-      // Initialize Leaflet map
-      this.mapInstance = L.map('routeMap').setView([19.0760, 72.8777], 12);
+    // Initialize enhanced map
+    if (window.enhancedMap) {
+      const mapInstance = window.enhancedMap.getMapInstance();
+      if (!mapInstance) {
+        // Trigger map initialization
+        document.dispatchEvent(new CustomEvent('initializeEnhancedMap', {
+          detail: { containerId: 'routeMap' }
+        }));
+      }
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(this.mapInstance);
+      // Display routes using enhanced map
+      setTimeout(() => {
+        document.dispatchEvent(new CustomEvent('displayRoutesOnMap', {
+          detail: {
+            routes: this.currentRoutes.routes,
+            startLocation: this.startLocation,
+            endLocation: this.endLocation
+          }
+        }));
+      }, 100);
     }
-
-    this.clearMapLayers();
-    this.displayAllRoutes();
-    this.fitAllRoutes();
   }
 
   displayAllRoutes() {
