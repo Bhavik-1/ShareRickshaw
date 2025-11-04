@@ -30,13 +30,23 @@ class RouteController {
         });
       }
 
-      // Calculate all route types in parallel for better performance
-      const [standRoutes, hybridRoutes, directAutoRoute, trainRoute] = await Promise.all([
-        RouteController.calculateStandRoutes(startLat, startLng, endLat, endLng),
-        RouteController.calculateHybridRoutes(startLat, startLng, endLat, endLng),
-        RouteController.calculateDirectAutoRoute(startLat, startLng, endLat, endLng),
-        RouteController.calculateTrainRoute(startLat, startLng, endLat, endLng)
-      ]);
+      // Check database connection
+      let databaseAvailable = false;
+      try {
+        await db.query('SELECT 1');
+        databaseAvailable = true;
+      } catch (dbError) {
+        console.warn('Database not available, using fallback routes:', dbError.message);
+      }
+
+      if (databaseAvailable) {
+        // Calculate all route types in parallel for better performance
+        const [standRoutes, hybridRoutes, directAutoRoute, trainRoute] = await Promise.all([
+          RouteController.calculateStandRoutes(startLat, startLng, endLat, endLng),
+          RouteController.calculateHybridRoutes(startLat, startLng, endLat, endLng),
+          RouteController.calculateDirectAutoRoute(startLat, startLng, endLat, endLng),
+          RouteController.calculateTrainRoute(startLat, startLng, endLat, endLng)
+        ]);
 
       res.json({
         success: true,
