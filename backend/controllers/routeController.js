@@ -70,6 +70,14 @@ class RouteController {
    */
   static async calculateStandRoutes(startLat, startLng, endLat, endLng) {
     try {
+      // Check database connection
+      try {
+        await db.query('SELECT 1');
+      } catch (dbError) {
+        console.error('Database connection error in calculateStandRoutes:', dbError);
+        return [];
+      }
+
       // Find stands within 2km of start location
       const nearbyStartStands = await RouteController.getNearbyStands(startLat, startLng, 2);
 
