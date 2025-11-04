@@ -86,8 +86,49 @@ INSERT INTO routes (stand_id, destination, fare, travel_time, destination_lat, d
 (10, 'Vikhroli Park Site', 20.00, '15 mins', 19.09500000, 72.92800000),
 (10, 'Kanjurmarg', 25.00, '18 mins', 19.12800000, 72.93800000);
 
+-- Insert Western Line train stations
+INSERT INTO train_stations (name, latitude, longitude, line) VALUES
+('Churchgate', 18.9337, 72.8263, 'Western'),
+('Marine Lines', 18.9433, 72.8256, 'Western'),
+('Charni Road', 18.9560, 72.8236, 'Western'),
+('Grant Road', 18.9645, 72.8213, 'Western'),
+('Mumbai Central', 18.9718, 72.8197, 'Western'),
+('Dadar', 19.0182, 72.8427, 'Western'),
+('Bandra', 19.0596, 72.8295, 'Western'),
+('Khar Road', 19.0726, 72.8322, 'Western'),
+('Santacruz', 19.0808, 72.8344, 'Western'),
+('Vile Parle', 19.0990, 72.8372, 'Western'),
+('Andheri', 19.1195, 72.8468, 'Western'),
+('Goregaon', 19.1664, 72.8570, 'Western'),
+('Borivali', 19.2307, 72.8567, 'Western'),
+('Dahisar', 19.4509, 72.8650, 'Western');
+
+-- Insert sample stand connections for hybrid routing
+-- These connections represent known direct routes between stands
+INSERT INTO stand_connections (from_stand_id, to_stand_id, distance_km, fare, travel_time_minutes, connection_type) VALUES
+-- Bandra to nearby stands
+(1, 4, 4.2, 35.00, 12, 'direct'), -- Bandra Station West to Kurla Station West
+(1, 3, 3.8, 30.00, 10, 'direct'), -- Bandra Station West to Dadar TT
+
+-- Andheri to nearby stands
+(2, 7, 8.5, 50.00, 20, 'direct'), -- Andheri Station East to Malad Station West
+(2, 9, 6.2, 40.00, 15, 'direct'), -- Andheri Station East to Powai Market
+
+-- Dadar connections
+(3, 1, 3.8, 30.00, 10, 'direct'), -- Dadar TT to Bandra Station West
+(3, 4, 5.1, 40.00, 12, 'direct'), -- Dadar TT to Kurla Station West
+(3, 5, 8.9, 60.00, 18, 'direct'), -- Dadar TT to Ghatkopar Station East
+
+-- Cross connections
+(4, 5, 4.5, 35.00, 11, 'direct'), -- Kurla Station West to Ghatkopar Station East
+(5, 6, 7.2, 45.00, 16, 'direct'), -- Ghatkopar Station East to Chembur Colony
+(7, 8, 5.8, 40.00, 13, 'direct'), -- Malad Station West to Borivali Station East
+(9, 10, 8.1, 55.00, 19, 'direct'); -- Powai Market to Vikhroli Station West
+
 -- Verification queries (optional, for testing)
 -- SELECT COUNT(*) as user_count FROM users; -- Should return 1
 -- SELECT COUNT(*) as stand_count FROM stands; -- Should return 10
 -- SELECT COUNT(*) as route_count FROM routes; -- Should return 32
+-- SELECT COUNT(*) as train_station_count FROM train_stations; -- Should return 14
+-- SELECT COUNT(*) as stand_connection_count FROM stand_connections; -- Should return 10
 -- SELECT s.name, COUNT(r.id) as route_count FROM stands s LEFT JOIN routes r ON s.id = r.stand_id GROUP BY s.id;
