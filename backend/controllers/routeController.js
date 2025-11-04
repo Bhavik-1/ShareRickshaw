@@ -592,6 +592,11 @@ class RouteController {
   }
 
   static parseTravelTime(travelTimeStr) {
+    // Handle null, undefined, or empty values
+    if (!travelTimeStr || typeof travelTimeStr !== 'string') {
+      return 10; // Default 10 minutes
+    }
+
     // Parse "10 mins", "15-20 mins", etc.
     const match = travelTimeStr.match(/(\d+)/);
     return match ? parseInt(match[1]) : 10;
