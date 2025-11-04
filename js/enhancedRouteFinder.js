@@ -652,6 +652,11 @@ class EnhancedRouteFinder {
         routeCard.classList.remove('highlighted');
       }, 3000);
     }
+
+    // Trigger route highlighting on enhanced map
+    document.dispatchEvent(new CustomEvent('highlightRoute', {
+      detail: { routeId: routeId }
+    }));
   }
 
   startNavigation(routeId) {
