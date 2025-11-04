@@ -46,9 +46,9 @@
     </div>
 
     <section class="page-header">
-      <h1>Find Best Share Auto Routes</h1>
+      <h1>Find Route</h1>
       <p class="subtitle">
-        Select your origin stand and destination to see available routes.
+        Enter start and end locations to compare multiple route options.
       </p>
     </section>
 
@@ -56,29 +56,51 @@
       <div style="max-width: 1200px; margin: 0 auto; width: 100%">
         <div class="calculator-card">
           <form id="routeFinderForm">
+            <!-- Start Location Input -->
             <div class="form-group">
-              <label for="standSelect">From (Stand)</label>
-              <select id="standSelect" class="form-select" required>
-                <option value="">-- Select a Stand --</option>
-              </select>
-              <div id="standError" class="error-message"></div>
+              <label for="startLocationInput">Start Location</label>
+              <div class="location-input-group">
+                <input
+                  type="text"
+                  id="startLocationInput"
+                  class="form-input"
+                  placeholder="e.g., Bandra Station, Linking Road"
+                  required
+                />
+                <button type="button" id="useCurrentLocationStart" class="btn btn-secondary" title="Use current location">
+                  📍 Current Location
+                </button>
+                <button type="button" id="selectOnMapStart" class="btn btn-secondary" title="Select on map">
+                  🗺️ Select on Map
+                </button>
+              </div>
+              <div id="startLocationError" class="error-message"></div>
             </div>
 
+            <!-- End Location Input -->
             <div class="form-group">
-              <label for="destinationInput">Destination</label>
-              <input
-                type="text"
-                id="destinationInput"
-                class="form-input"
-                placeholder="e.g., Linking Road, Bandra Market"
-                required
-              />
-              <div id="destinationError" class="error-message"></div>
+              <label for="endLocationInput">End Location</label>
+              <div class="location-input-group">
+                <input
+                  type="text"
+                  id="endLocationInput"
+                  class="form-input"
+                  placeholder="e.g., Andheri Station, Juhu Beach"
+                  required
+                />
+                <button type="button" id="useCurrentLocationEnd" class="btn btn-secondary" title="Use current location">
+                  📍 Current Location
+                </button>
+                <button type="button" id="selectOnMapEnd" class="btn btn-secondary" title="Select on map">
+                  🗺️ Select on Map
+                </button>
+              </div>
+              <div id="endLocationError" class="error-message"></div>
             </div>
 
             <div class="button-group">
               <button type="button" id="findRouteBtn" class="btn btn-primary">
-                Find Route
+                Find Routes
               </button>
               <button type="button" id="resetBtn" class="btn btn-secondary">
                 Reset
@@ -86,15 +108,58 @@
             </div>
           </form>
 
-          <div id="resultsContainer" class="results-container">
-            <h2 id="resultsHeader" class="section-heading"></h2>
+          <!-- Loading State -->
+          <div id="loadingContainer" class="loading-container" style="display: none">
+            <div class="loading-spinner"></div>
+            <p>Calculating best routes...</p>
+          </div>
+
+          <!-- Route Results with Tabs -->
+          <div id="resultsContainer" class="results-container" style="display: none">
+            <div class="route-tabs">
+              <button class="tab-btn active" data-tab="all-routes">All Routes</button>
+              <button class="tab-btn" data-tab="fastest">Fastest</button>
+              <button class="tab-btn" data-tab="cheapest">Cheapest</button>
+              <button class="tab-btn" data-tab="shortest">Shortest</button>
+            </div>
+
             <div id="routeCardsContainer"></div>
             <div
               id="noResultsMessage"
               class="no-results-message"
               style="display: none"
             >
-              No direct share-auto route found. Try nearby stands.
+              No routes found. Please check your locations and try again.
+            </div>
+          </div>
+
+          <!-- Map Section -->
+          <div id="mapContainer" class="map-container" style="display: none">
+            <div class="map-header">
+              <h3>Route Map</h3>
+              <div class="map-controls">
+                <button id="zoomFitRoutes" class="btn btn-sm btn-secondary">Fit All Routes</button>
+                <button id="toggleRouteLegend" class="btn btn-sm btn-secondary">Toggle Legend</button>
+              </div>
+            </div>
+            <div id="routeMap" class="route-map"></div>
+            <div id="routeLegend" class="route-legend" style="display: none">
+              <div class="legend-item">
+                <span class="legend-color" style="background: #3b82f6;"></span>
+                <span>Share Auto Routes</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color" style="background: #10b981;"></span>
+                <span>Hybrid Routes</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color" style="background: #8b5cf6;"></span>
+                <span>Direct Auto</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color" style="background: #f97316;"></span>
+                <span>Train Routes</span>
+              </div>
             </div>
           </div>
 
