@@ -200,7 +200,145 @@ exports.triggerSOS = async (req, res) => {
   }
 };
 
-// --- NEW FEATURE: Auto Number Capture ---
+// --- NEW FUNCTION: Check if a plate has been captured in the last 3 hours ---
+exports.checkRecentAutoCapture = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Calculate timestamp for 3 hours ago
+    const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    const [recentCapture] = await db.query(
+      `SELECT license_plate, captured_at 
+       FROM auto_captures 
+       WHERE user_id = ? AND captured_at >= ?
+       ORDER BY captured_at DESC
+       LIMIT 1`,
+      [userId, threeHoursAgo]
+    );
+
+    if (recentCapture.length > 0) {
+      // Plate found in the last 3 hours
+      return res.json({
+        success: true,
+        isRecent: true,
+        license_plate: recentCapture[0].license_plate,
+        captured_at: recentCapture[0].captured_at,
+        message: `License plate ${recentCapture[0].license_plate} was captured recently.`,
+      });
+    }
+
+    // No recent plate found
+    res.json({
+      success: true,
+      isRecent: false,
+      message: "No recent license plate capture found.",
+    });
+  } catch (error) {
+    console.error("Check recent auto capture error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to check recent auto capture.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// --- MODIFIED FUNCTION: Night Tracking Update ---
+
+// POST /api/safety/night-track/update
+// Purpose: Receive user's live location and auto number, and send tracking email.
+exports.sendNightLocationUpdate = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    // Receive autoNumber directly from the request body
+    const { latitude, longitude, accuracy } = req.body.location;
+    const autoNumber = req.body.autoNumber || null; // New field
+
+    // 1. Validate input
+    if (!latitude || !longitude) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid latitude and longitude are required",
+      });
+    }
+
+    // 2. Get user information (name, email)
+    const [users] = await db.query(
+      "SELECT id, username, full_name, phone_number, email FROM users WHERE id = ?",
+      [userId]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    const user = users[0];
+    const userName = user.full_name || user.username;
+
+    // 3. Get emergency contacts with email
+    const [emergencyContacts] = await db.query(
+      "SELECT id, contact_name, contact_phone, contact_email FROM emergency_contacts WHERE user_id = ? AND contact_email IS NOT NULL ORDER BY created_at ASC",
+      [userId]
+    );
+
+    // Check if any contacts are available to send to
+    if (emergencyContacts.length === 0) {
+      // NOTE: This intentionally returns 200 OK but sets success to false and includes a stop flag.
+      return res.status(200).json({
+        success: false,
+        message:
+          "No contacts with email configured for Night Mode tracking. Stopping updates.",
+        noContacts: true,
+      });
+    }
+
+    // 4. Prepare location object
+    const location = { latitude, longitude, accuracy: accuracy || 0 };
+
+    // 5. Send tracking emails to all contacts
+    const trackingPromises = emergencyContacts.map((contact) =>
+      emailService.sendLocationTrackingEmail(
+        contact.contact_email,
+        userName,
+        location,
+        autoNumber // Pass the received autoNumber to the email service
+      )
+    );
+
+    const emailResults = await Promise.all(trackingPromises);
+    const successfulEmails = emailResults.filter((result) => result.success);
+
+    console.log(
+      `Night Track: Sent updates to ${successfulEmails.length} contacts.`
+    );
+
+    res.json({
+      success: successfulEmails.length > 0,
+      message: `Location update sent to ${successfulEmails.length} contact(s).`,
+      data: {
+        license_plate: autoNumber, // Return the plate back to the client
+        contactsSent: successfulEmails.length,
+        totalContacts: emergencyContacts.length,
+        location: location,
+      },
+    });
+  } catch (error) {
+    console.error("Night location update error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to send night location update.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// --- Existing SOS Routes (keeping for context) ---
 
 // POST /api/safety/capture-auto
 // Purpose: Process image, extract number plate via Gemini, and store data
@@ -331,8 +469,6 @@ exports.getAutoCaptureHistory = async (req, res) => {
   }
 };
 
-// --- Existing SOS Routes (keeping for context) ---
-
 // GET /api/sos/status
 // Purpose: Check SOS status and cooldown
 exports.getSOSStatus = async (req, res) => {
@@ -456,6 +592,8 @@ module.exports = {
   getSOSStatus: exports.getSOSStatus,
   getSOSLogs: exports.getSOSLogs,
   testEmailService: exports.testEmailService,
-  captureAutoNumber: exports.captureAutoNumber, // Export new function
-  getAutoCaptureHistory: exports.getAutoCaptureHistory, // Export new function
+  captureAutoNumber: exports.captureAutoNumber, // Export existing function
+  getAutoCaptureHistory: exports.getAutoCaptureHistory, // Export existing function
+  sendNightLocationUpdate: exports.sendNightLocationUpdate, // Export modified function
+  checkRecentAutoCapture: exports.checkRecentAutoCapture, // Export new function
 };
