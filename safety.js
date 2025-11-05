@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // ========================================
   let nightModeInterval = null;
   const TRACKING_INTERVAL_MS = 120000; // 2 minutes
-  const NIGHT_START_HOUR = 22; // 10 PM
-  const NIGHT_END_HOUR = 5; // 5 AM
+  const NIGHT_START_HOUR = 22; // 10 PM (Kept for reference, but no longer enforces restriction)
+  const NIGHT_END_HOUR = 5; // 5 AM (Kept for reference, but no longer enforces restriction)
   let contactCount = 1;
   const MAX_CONTACTS = 5;
   const API_BASE_URL = window.API_BASE_URL; // Global API URL from auth.js
@@ -423,59 +423,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /**
    * Checks the time and enables/disables the Night Mode UI and auto-start.
+   * FIX: This function is simplified to always show the card and reset the state,
+   * making the feature always available for manual toggle.
    */
   function initializeNightMode() {
-    nightModeError.classList.add("hidden");
-    const currentTime = new Date();
-    const currentHour = currentTime.getHours();
+    nightModeCard.classList.remove("hidden"); // Always show the card
+    stopNightMode(false); // Ensure the state is OFF initially
 
-    // Check if current time is between 10 PM (22) and 5 AM (5)
-    const isNightTime =
-      currentHour >= NIGHT_START_HOUR || currentHour < NIGHT_END_HOUR;
-
-    if (isNightTime) {
-      nightModeCard.classList.remove("hidden"); // Show the card
-
-      // Auto-on by default
-      // startNightMode(true); // Auto-start the check
-    } else {
-      // Show the card and display time restriction message
-      nightModeCard.classList.remove("hidden");
-      stopNightMode(false);
-
-      nightModeStatus.classList.remove("hidden");
-      nightModeStatus.textContent = `Night Mode is only available between ${NIGHT_START_HOUR}:00 and ${
-        NIGHT_END_HOUR < 10 ? "0" + NIGHT_END_HOUR : NIGHT_END_HOUR
-      }:00 (10 PM - 5 AM).`;
-      nightModeStatus.style.background = "#fff3cd";
-      nightModeStatus.style.color = "#856404";
-    }
+    // Display a neutral prompt instead of a restriction message
+    nightModeStatus.classList.remove("hidden");
+    nightModeStatus.textContent =
+      "Night Mode allows live tracking to contacts. Toggle ON to start.";
+    nightModeStatus.style.background = "#e3f2fd";
+    nightModeStatus.style.color = "#1565c0";
   }
 
   nightModeToggle.addEventListener("click", function () {
     toggleNightMode();
   });
 
+  /**
+   * Toggles Night Mode ON or OFF regardless of the time of day.
+   * FIX: Removed time-of-day restriction.
+   */
   function toggleNightMode() {
     nightModeError.classList.add("hidden");
-    const currentTime = new Date();
-    const currentHour = currentTime.getHours();
-    const isNightTime =
-      currentHour >= NIGHT_START_HOUR || currentHour < NIGHT_END_HOUR;
-
-    if (!isNightTime) {
-      showNightModeError(
-        `Night Mode can only be manually toggled ON/OFF during night hours (${NIGHT_START_HOUR}:00 to ${
-          NIGHT_END_HOUR < 10 ? "0" + NIGHT_END_HOUR : NIGHT_END_HOUR
-        }:00).`
-      );
-      return;
-    }
 
     if (nightModeToggle.classList.contains("active")) {
-      stopNightMode();
+      stopNightMode(true); // Stop and reset UI
     } else {
-      startNightMode(true); // Start the flow when manually turned on
+      startNightMode(true); // Start the flow when manually turned on (with plate check)
     }
   }
 
@@ -847,5 +824,141 @@ document.addEventListener("DOMContentLoaded", function () {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
     return hours + ":" + minutes + ":" + seconds;
+  }
+
+  // --- Capture Handlers ---
+
+  /**
+   * Clears all status and result messages for the capture feature.
+   */
+  function clearCaptureMessages() {
+    uploadError.classList.add("hidden");
+    captureSuccess.classList.add("hidden");
+    extractedPlate.textContent = "---";
+    photoTimestamp.textContent = "---";
+    photoLocation.textContent = "---";
+    document.getElementById("photoMetadata").classList.add("hidden");
+  }
+
+  function displayImagePreview(dataURL) {
+    // Clear preview area
+    previewArea.innerHTML = "";
+    previewArea.classList.add("has-image");
+    const img = document.createElement("img");
+    img.src = dataURL;
+    previewArea.appendChild(img);
+  }
+
+  function showUploadError(message) {
+    uploadError.textContent = message;
+    uploadError.classList.remove("hidden");
+  }
+
+  /**
+   * Combined file selection handler for standalone and Night Mode.
+   */
+  async function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Determine if we are in the Night Mode flow
+    const isNightModeFlow =
+      nightModeToggle.classList.contains("active") &&
+      nightModeInterval === null;
+
+    clearCaptureMessages();
+    uploadButton.disabled = true;
+    uploadButton.textContent = "Processing...";
+
+    // Validate file type and size
+    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+      showUploadError("Invalid file. Please upload an image under 5MB.");
+      uploadButton.disabled = false;
+      uploadButton.textContent = "📷 Capture/Upload Plate Photo";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+      const dataUri = e.target.result;
+      const prefix = dataUri.substring(0, dataUri.indexOf(",") + 1);
+      const base64Image = dataUri.substring(prefix.length);
+      let location;
+      let plate = null;
+      let captureError = null;
+
+      try {
+        // 1. Get location
+        location = await locationService.getCurrentLocation();
+        const { latitude, longitude } = location;
+
+        // 2. Send to backend for Gemini processing and storage
+        const response = await fetch(`${API_BASE_URL}/safety/capture-auto`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            imageBase64: base64Image,
+            latitude: latitude,
+            longitude: longitude,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Capture failed.");
+        }
+
+        plate = data.data.license_plate;
+
+        // 3. Update the manual capture section for visual confirmation
+        displayImagePreview(dataUri);
+        extractedPlate.textContent = plate;
+        photoTimestamp.textContent = formatDateTime(new Date());
+        photoLocation.textContent = `Lat: ${latitude.toFixed(
+          6
+        )}, Lng: ${longitude.toFixed(6)}`;
+        document.getElementById("photoMetadata").classList.remove("hidden");
+        captureSuccess.classList.remove("hidden");
+        loadCaptureHistory();
+      } catch (error) {
+        console.error("Capture Error:", error);
+        captureError = error;
+
+        // Display generic error in the standalone section
+        showUploadError(
+          plate
+            ? `Plate '${plate}' detected but failed to save history. `
+            : `AI processing failed. Check connection or try again. `
+        );
+      } finally {
+        // Handle Night Mode flow continuation
+        if (isNightModeFlow) {
+          if (plate) {
+            // If plate was successfully extracted and processed
+            nightModePlate = plate;
+            nightModePlateDisplay.textContent = `Auto Plate: ${nightModePlate}`;
+            startTrackingInterval();
+            showNotification(
+              `Plate Captured! Tracking started with Auto: ${nightModePlate}`,
+              "success"
+            );
+          } else {
+            // On failure, start tracking without a plate
+            nightModePlate = null;
+            startTrackingInterval();
+            showNightModeError(`Plate capture failed. Tracking location only.`);
+          }
+        }
+
+        fileInput.value = ""; // Clear file input
+        uploadButton.disabled = false;
+        uploadButton.textContent = "📷 Capture/Upload Plate Photo";
+      }
+    };
+    reader.readAsDataURL(file);
   }
 });
