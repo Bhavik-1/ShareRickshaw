@@ -24,47 +24,135 @@
     <link rel="stylesheet" href="styles.css" />
 
     <style>
-      /* Map page layout */
+      /* Enhanced Map page layout */
       .map-page {
-        padding-top: 80px;
+        padding-top: 0;
       }
 
       .page-header {
         text-align: center;
-        padding: 40px 20px;
-        background: var(--color-bg-light);
+        padding: 4rem 2rem;
+        background: var(--gradient-primary);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        animation: float-dots 25s linear infinite;
       }
 
       .page-header h1 {
-        font-size: 36px;
-        color: var(--color-text-primary);
-        margin-bottom: 12px;
+        font-size: 3rem;
+        font-weight: var(--font-weight-extrabold);
+        color: var(--color-white);
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
 
       .subtitle {
-        font-size: 18px;
-        color: var(--color-text-secondary);
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        position: relative;
+        z-index: 1;
+        font-weight: var(--font-weight-normal);
       }
 
-      /* Search section */
+      /* Enhanced Search section */
       .search-section {
-        max-width: 600px;
-        margin: 30px auto;
-        padding: 0 20px;
+        max-width: 700px;
+        margin: 3rem auto;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 10;
+      }
+
+      .search-container {
+        position: relative;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-backdrop);
+        -webkit-backdrop-filter: var(--glass-backdrop);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius-xl);
+        padding: 1.5rem;
+        box-shadow: var(--glass-shadow);
       }
 
       #search-input {
         width: 100%;
-        padding: 12px 20px;
-        font-size: 16px;
-        border: 2px solid var(--color-border);
-        border-radius: 8px;
-        transition: border-color 0.3s;
+        padding: 18px 24px 18px 60px;
+        font-size: 1.1rem;
+        border: none;
+        border-radius: var(--border-radius-lg);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: var(--glass-backdrop);
+        -webkit-backdrop-filter: var(--glass-backdrop);
+        transition: all var(--transition-normal) ease;
+        outline: none;
+        font-family: var(--font-family);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       }
 
       #search-input:focus {
-        outline: none;
-        border-color: var(--color-primary);
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+      }
+
+      #search-input::placeholder {
+        color: var(--color-text-light);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 3.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        z-index: 1;
+      }
+
+      /* Filter buttons */
+      .filter-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .filter-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: var(--border-radius-full);
+        background: rgba(102, 126, 234, 0.1);
+        color: var(--color-primary);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: all var(--transition-normal) ease;
+        font-size: 0.9rem;
+      }
+
+      .filter-btn:hover {
+        background: var(--gradient-primary);
+        color: var(--color-white);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .filter-btn.active {
+        background: var(--gradient-primary);
+        color: var(--color-white);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
 
       /* Map container */
