@@ -40,6 +40,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const uploadError = document.getElementById("uploadError");
   const captureSuccess = document.getElementById("captureSuccess");
 
+  // Feature 3: Trip Sharing
+  const tripSharingForm = document.getElementById("tripSharingForm");
+  const pickupLocationInput = document.getElementById("pickupLocation");
+  const destinationInput = document.getElementById("destination");
+  const autoNumberInput = document.getElementById("autoNumber");
+  const contactsList = document.getElementById("contactsList");
+  const addContactBtn = document.getElementById("addContactBtn");
+
   // Feature 4: Night Mode Safety
   const nightModeCard = document.getElementById("nightModeCard");
   const nightModeToggle = document.getElementById("nightModeToggle");
@@ -56,10 +64,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const historyList = document.getElementById("captureHistoryList");
   const historyLoading = document.getElementById("historyLoading");
   const noHistoryMessage = document.getElementById("noHistoryMessage");
-
-  // Feature 3: Trip Sharing
-  const contactsList = document.getElementById("contactsList");
-  const addContactBtn = document.getElementById("addContactBtn");
 
   // NEW: Capture Modal Elements
   const captureModal = document.getElementById("captureModal");
@@ -84,8 +88,338 @@ document.addEventListener("DOMContentLoaded", function () {
   captureModalClose.addEventListener("click", closeCaptureModal);
 
   // ========================================
-  // NIGHT MODE LOGIC
+  // FIX: ADD MISSING EVENT LISTENERS HERE
   // ========================================
+
+  // Feature 1: Emergency SOS
+  if (sosButton) {
+    sosButton.addEventListener("click", handleSosButton);
+  }
+  if (modalCancel) {
+    modalCancel.addEventListener("click", () =>
+      sosModal.classList.remove("show")
+    );
+  }
+  if (modalConfirm) {
+    modalConfirm.addEventListener("click", handleConfirmSos);
+  }
+
+  // Feature 2: Auto Number Capture (Trigger file input)
+  if (uploadButton && fileInput) {
+    uploadButton.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", handleFileSelect); // Use the combined handler
+  }
+
+  // Feature 3: Trip Sharing
+  if (addContactBtn) {
+    addContactBtn.addEventListener("click", addContactField);
+  }
+  if (tripSharingForm) {
+    tripSharingForm.addEventListener("submit", handleTripSharingSubmit);
+  }
+
+  // ========================================
+  // HANDLER FUNCTIONS
+  // ========================================
+
+  // --- SOS Handlers ---
+
+  // Handle SOS Button click: opens the modal and fetches location
+  function handleSosButton() {
+    sosSuccess.classList.add("hidden");
+    sosError.classList.add("hidden");
+
+    // Immediately try to fetch location for display
+    sosLocation.querySelector(".coords").textContent = "Fetching location...";
+
+    // Use locationService to get location
+    locationService
+      .getCurrentLocation()
+      .then((location) => {
+        const { latitude, longitude, accuracy } = location;
+        sosLocation.querySelector(
+          ".coords"
+        ).textContent = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(
+          6
+        )}`;
+      })
+      .catch((error) => {
+        sosLocation.querySelector(
+          ".coords"
+        ).textContent = `Error: ${error.message.substring(0, 30)}...`;
+        console.error("SOS location error:", error);
+      })
+      .finally(() => {
+        sosModal.classList.add("show");
+      });
+  }
+
+  // Handle the confirmation inside the SOS modal
+  async function handleConfirmSos() {
+    sosModal.classList.remove("show");
+    sosError.classList.add("hidden");
+    let lat = 0,
+      lng = 0,
+      accuracy = 0;
+
+    try {
+      // Get the most accurate location from the service
+      const finalLocation = await locationService.captureSOSLocation();
+      lat = finalLocation.latitude;
+      lng = finalLocation.longitude;
+      accuracy = finalLocation.accuracy;
+    } catch (e) {
+      console.warn("Final SOS location capture failed:", e.message);
+      // Fallback location will be 0,0 if locationService couldn't even get a last known location.
+      // The backend will handle the invalid location.
+    }
+
+    // --- Send to Backend Logic ---
+    try {
+      const response = await fetch(`${API_BASE_URL}/safety/sos/trigger`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({
+          location: {
+            latitude: lat,
+            longitude: lng,
+            accuracy: accuracy,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        // Handle backend errors
+        if (data.requiresContacts || data.requiresEmails) {
+          sosError.innerHTML =
+            data.message +
+            ' <a href="profile.html">Add them in your Profile.</a>';
+        } else {
+          sosError.textContent = data.message || "Failed to trigger SOS.";
+        }
+        sosError.classList.remove("hidden");
+        return;
+      }
+
+      // Success
+      sosSuccess.querySelector("p").textContent = data.message;
+      sosSuccess.classList.remove("hidden");
+      sosLocation.querySelector(".coords").textContent = `Lat: ${lat.toFixed(
+        6
+      )}, Lng: ${lng.toFixed(6)}`;
+      showNotification("SOS triggered!", "danger");
+    } catch (error) {
+      console.error("SOS trigger API error:", error);
+      sosError.textContent =
+        "Unable to connect to safety server. Please check the backend connection.";
+      sosError.classList.remove("hidden");
+    }
+  }
+
+  // --- Trip Sharing Handler ---
+
+  function handleTripSharingSubmit(e) {
+    e.preventDefault();
+
+    // Clear previous errors
+    document
+      .querySelectorAll("#tripSharingForm .error-message")
+      .forEach((el) => el.classList.add("hidden"));
+
+    const pickup = pickupLocationInput.value.trim();
+    const destination = destinationInput.value.trim();
+    const autoNumber = autoNumberInput.value.trim();
+    const contactInputs = Array.from(
+      contactsList.querySelectorAll('input[type="text"]')
+    ).map((input) => input.value.trim());
+
+    let isValid = true;
+
+    if (pickup.length < 5) {
+      document.getElementById("pickupError").textContent =
+        "Pickup location must be at least 5 characters.";
+      document.getElementById("pickupError").classList.remove("hidden");
+      isValid = false;
+    }
+
+    if (destination.length < 5) {
+      document.getElementById("destinationError").textContent =
+        "Destination must be at least 5 characters.";
+      document.getElementById("destinationError").classList.remove("hidden");
+      isValid = false;
+    }
+
+    // Basic auto number validation (optional, allow empty)
+    if (autoNumber.length > 0 && autoNumber.length < 5) {
+      document.getElementById("autoNumberError").textContent =
+        "Auto number is too short.";
+      document.getElementById("autoNumberError").classList.remove("hidden");
+      isValid = false;
+    }
+
+    const validContacts = contactInputs.filter((contact) => contact.length > 0);
+    if (validContacts.length === 0) {
+      showNotification("Please add at least one contact.", "error");
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    // --- Placeholder: Implement real sharing logic here (e.g., API call to trigger SMS/Email sharing) ---
+    const shareMessage = `I'm traveling by Share Auto. Pickup: ${pickup}, Destination: ${destination}. Auto No: ${
+      autoNumber || "N/A"
+    }. Track me!`;
+    console.log("Sharing message:", shareMessage);
+    console.log("Shared with contacts:", validContacts);
+
+    showNotification(
+      "Trip details shared successfully (Placeholder: API call simulated).",
+      "success"
+    );
+  }
+
+  // --- Capture Handlers ---
+
+  /**
+   * Clears all status and result messages for the capture feature.
+   */
+  function clearCaptureMessages() {
+    uploadError.classList.add("hidden");
+    captureSuccess.classList.add("hidden");
+    extractedPlate.textContent = "---";
+    photoTimestamp.textContent = "---";
+    photoLocation.textContent = "---";
+    document.getElementById("photoMetadata").classList.add("hidden");
+  }
+
+  function displayImagePreview(dataURL) {
+    // Clear preview area
+    previewArea.innerHTML = "";
+    previewArea.classList.add("has-image");
+    const img = document.createElement("img");
+    img.src = dataURL;
+    previewArea.appendChild(img);
+  }
+
+  function showUploadError(message) {
+    uploadError.textContent = message;
+    uploadError.classList.remove("hidden");
+  }
+
+  /**
+   * Combined file selection handler for standalone and Night Mode.
+   */
+  async function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Determine if we are in the Night Mode flow
+    const isNightModeFlow =
+      nightModeToggle.classList.contains("active") &&
+      nightModeInterval === null;
+
+    clearCaptureMessages();
+    uploadButton.disabled = true;
+    uploadButton.textContent = "Processing...";
+
+    // Validate file type and size
+    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+      showUploadError("Invalid file. Please upload an image under 5MB.");
+      uploadButton.disabled = false;
+      uploadButton.textContent = "📷 Capture/Upload Plate Photo";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+      const dataUri = e.target.result;
+      const prefix = dataUri.substring(0, dataUri.indexOf(",") + 1);
+      const base64Image = dataUri.substring(prefix.length);
+      let location;
+      let plate = null;
+      let captureError = null;
+
+      try {
+        // 1. Get location
+        location = await locationService.getCurrentLocation();
+        const { latitude, longitude } = location;
+
+        // 2. Send to backend for Gemini processing and storage
+        const response = await fetch(`${API_BASE_URL}/safety/capture-auto`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            imageBase64: base64Image,
+            latitude: latitude,
+            longitude: longitude,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Capture failed.");
+        }
+
+        plate = data.data.license_plate;
+
+        // 3. Update the manual capture section for visual confirmation
+        displayImagePreview(dataUri);
+        extractedPlate.textContent = plate;
+        photoTimestamp.textContent = formatDateTime(new Date());
+        photoLocation.textContent = `Lat: ${latitude.toFixed(
+          6
+        )}, Lng: ${longitude.toFixed(6)}`;
+        document.getElementById("photoMetadata").classList.remove("hidden");
+        captureSuccess.classList.remove("hidden");
+        loadCaptureHistory();
+      } catch (error) {
+        console.error("Capture Error:", error);
+        captureError = error;
+
+        // Display generic error in the standalone section
+        showUploadError(
+          plate
+            ? `Plate '${plate}' detected but failed to save history. `
+            : `AI processing failed. Check connection or try again. `
+        );
+      } finally {
+        // Handle Night Mode flow continuation
+        if (isNightModeFlow) {
+          if (plate) {
+            // If plate was successfully extracted and processed
+            nightModePlate = plate;
+            nightModePlateDisplay.textContent = `Auto Plate: ${nightModePlate}`;
+            startTrackingInterval();
+            showNotification(
+              `Plate Captured! Tracking started with Auto: ${nightModePlate}`,
+              "success"
+            );
+          } else {
+            // On failure, start tracking without a plate
+            nightModePlate = null;
+            startTrackingInterval();
+            showNightModeError(`Plate capture failed. Tracking location only.`);
+          }
+        }
+
+        fileInput.value = ""; // Clear file input
+        uploadButton.disabled = false;
+        uploadButton.textContent = "📷 Capture/Upload Plate Photo";
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // --- Night Mode Handlers ---
 
   /**
    * Checks the time and enables/disables the Night Mode UI and auto-start.
@@ -103,7 +437,7 @@ document.addEventListener("DOMContentLoaded", function () {
       nightModeCard.classList.remove("hidden"); // Show the card
 
       // Auto-on by default
-      startNightMode(true); // Pass true to trigger the plate check flow
+      // startNightMode(true); // Auto-start the check
     } else {
       // Show the card and display time restriction message
       nightModeCard.classList.remove("hidden");
@@ -146,36 +480,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Starts Night Mode and initiates the plate capture flow if requested.
-   * @param {boolean} triggerPlateCheck - Whether to ask the user for a plate capture.
-   */
-  async function startNightMode(triggerPlateCheck = false) {
-    // 1. Update UI to active state
-    nightModeToggle.classList.add("active");
-    nightModeError.classList.add("hidden");
-    nightModeStatus.classList.remove("hidden");
-    nightModeStatus.textContent = `✓ Night mode active — Initializing tracking...`;
-    nightModeStatus.style.background = "#e8f5e9";
-    nightModeStatus.style.color = "#2e7d32";
-    nightModeCoords.classList.remove("hidden");
-    nightModePlateDisplay.textContent = "Auto Plate: N/A"; // Reset plate display
-
-    // 2. Clear existing interval
-    if (nightModeInterval) {
-      clearInterval(nightModeInterval);
-    }
-
-    // 3. Handle Plate Capture Flow (Only on initial start/toggle ON)
-    if (triggerPlateCheck) {
-      await checkPlateCaptureStatus();
-    } else {
-      // If not checking plate, start tracking immediately (no plate data for now)
-      nightModePlate = null;
-      startTrackingInterval();
-    }
-  }
-
-  /**
    * Checks database for recent plate capture, then prompts user.
    */
   async function checkPlateCaptureStatus() {
@@ -212,6 +516,36 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
+   * Starts Night Mode and initiates the plate capture flow if requested.
+   * @param {boolean} triggerPlateCheck - Whether to ask the user for a plate capture.
+   */
+  async function startNightMode(triggerPlateCheck = false) {
+    // 1. Update UI to active state
+    nightModeToggle.classList.add("active");
+    nightModeError.classList.add("hidden");
+    nightModeStatus.classList.remove("hidden");
+    nightModeStatus.textContent = `✓ Night mode active — Initializing tracking...`;
+    nightModeStatus.style.background = "#e8f5e9";
+    nightModeStatus.style.color = "#2e7d32";
+    nightModeCoords.classList.remove("hidden");
+    nightModePlateDisplay.textContent = "Auto Plate: N/A"; // Reset plate display
+
+    // 2. Clear existing interval
+    if (nightModeInterval) {
+      clearInterval(nightModeInterval);
+    }
+
+    // 3. Handle Plate Capture Flow (Only on initial start/toggle ON)
+    if (triggerPlateCheck) {
+      await checkPlateCaptureStatus();
+    } else {
+      // If not checking plate, start tracking immediately (no plate data for now)
+      nightModePlate = null;
+      startTrackingInterval();
+    }
+  }
+
+  /**
    * Starts the 2-minute location reporting loop.
    */
   function startTrackingInterval() {
@@ -228,7 +562,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const plateStatus = nightModePlate
       ? `Auto ${nightModePlate}`
       : "No auto plate recorded.";
-    nightModeStatus.textContent = `✓ Night mode active (${plateStatus}) — Sharing every 2 minutes.`;
+    nightModeStatus.textContent = `✓ Tracking active (${plateStatus}) — Sharing every 2 minutes.`;
   }
 
   function stopNightMode(resetUI = true) {
@@ -347,10 +681,7 @@ document.addEventListener("DOMContentLoaded", function () {
     nightModeStatus.classList.add("hidden");
   }
 
-  // ========================================
-  // NEW CAPTURE MODAL HANDLERS
-  // ========================================
-
+  // --- Night Mode Modal Handlers ---
   function closeCaptureModal() {
     captureModal.classList.add("hidden");
   }
@@ -358,9 +689,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function handleCaptureModalYes() {
     closeCaptureModal();
     // Directly trigger the photo capture mechanism (using the existing file input flow)
-    // Since we need the result before starting the timer, we must redefine the capture function flow.
-
-    // Open the file dialog for the user to select the image
     fileInput.click();
   }
 
@@ -370,159 +698,47 @@ document.addEventListener("DOMContentLoaded", function () {
     startTrackingInterval(); // Start tracking without plate
   }
 
-  // NOTE: We must override the existing `handleFileSelect` logic temporarily for the Night Mode flow
-  // to ensure that AFTER a successful capture, the Night Mode tracking starts.
+  // ========================================
+  // TRIP SHARING LOGIC
+  // ========================================
 
-  // Keep a reference to the original handleFileSelect to use its core logic
-  const originalHandleFileSelect = handleFileSelect;
+  function addContactField() {
+    const contactDiv = document.createElement("div");
+    contactDiv.className = "contact-item";
+    contactDiv.innerHTML = `
+            <input type="text" placeholder="Phone or Email">
+            <button type="button" class="remove-btn">✕</button>
+        `;
 
-  // New handler that is aware of the Night Mode context
-  fileInput.addEventListener("change", function (event) {
-    if (!nightModeToggle.classList.contains("active")) {
-      // If Night Mode is not active, run the original capture flow (standalone)
-      originalHandleFileSelect(event);
-      return;
-    }
+    // Attach remove event listener
+    const removeBtn = contactDiv.querySelector(".remove-btn");
+    removeBtn.addEventListener("click", function () {
+      removeContactField(contactDiv);
+    });
 
-    // If Night Mode IS active, run the capture but immediately use the result for tracking
-    handleNightModeFileSelect(event);
-  });
-
-  /**
-   * Modified file selection handler for Night Mode.
-   */
-  async function handleNightModeFileSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    // Clear previous results/errors in the standalone section
-    clearCaptureMessages();
-    uploadButton.disabled = true;
-    uploadButton.textContent = "Processing for Night Mode...";
-
-    const reader = new FileReader();
-    reader.onload = async function (e) {
-      const dataUri = e.target.result;
-      const prefix = dataUri.substring(0, dataUri.indexOf(",") + 1);
-      const base64Image = dataUri.substring(prefix.length);
-
-      try {
-        // 1. Get location
-        const location = await locationService.getCurrentLocation();
-        const { latitude, longitude } = location;
-
-        // 2. Send to backend for Gemini processing and storage
-        const response = await fetch(`${API_BASE_URL}/safety/capture-auto`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getToken()}`,
-          },
-          body: JSON.stringify({
-            imageBase64: base64Image,
-            latitude: latitude,
-            longitude: longitude,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-          throw new Error(data.message || "Capture failed.");
-        }
-
-        // 3. Success: Set the plate, start tracking, and update history
-        nightModePlate = data.data.license_plate;
-        nightModePlateDisplay.textContent = `Auto Plate: ${nightModePlate}`;
-        startTrackingInterval(); // Start the interval with the plate!
-
-        showNotification(
-          `Plate Captured! Tracking started with Auto: ${nightModePlate}`,
-          "success"
-        );
-
-        // Update the manual capture section as well for visual confirmation
-        displayImagePreview(dataUri);
-        extractedPlate.textContent = nightModePlate;
-        photoTimestamp.textContent = formatDateTime(new Date());
-        photoLocation.textContent = `Lat: ${latitude.toFixed(
-          6
-        )}, Lng: ${longitude.toFixed(6)}`;
-        document.getElementById("photoMetadata").classList.remove("hidden");
-        captureSuccess.classList.remove("hidden");
-
-        loadCaptureHistory();
-      } catch (error) {
-        console.error("Night Mode Capture Error:", error);
-        // On failure, start tracking without a plate
-        nightModePlate = null;
-        startTrackingInterval();
-
-        // Notify user of capture failure but proceeding with location
-        showNightModeError(
-          `Plate capture failed (${error.message}). Tracking location only.`
-        );
-      } finally {
-        fileInput.value = ""; // Clear file input
-        uploadButton.disabled = false;
-        uploadButton.textContent = "📷 Capture/Upload Plate Photo";
-      }
-    };
-    reader.readAsDataURL(file);
+    contactsList.appendChild(contactDiv);
+    contactCount++;
+    updateAddButtonState();
   }
 
-  // --- Utility functions from original handleFileSelect needed for reuse ---
-  function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+  function removeContactField(element) {
+    element.remove();
+    contactCount--;
+    updateAddButtonState();
+  }
 
-    // Clear previous results/errors
-    clearCaptureMessages();
-    uploadButton.disabled = true;
-    uploadButton.textContent = "Processing...";
-
-    // Validate file type and size
-    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
-      showUploadError("Invalid file. Please upload an image under 5MB.");
-      uploadButton.disabled = false;
-      uploadButton.textContent = "📷 Capture/Upload Plate Photo";
-      return;
+  function updateAddButtonState() {
+    // Only allow up to MAX_CONTACTS fields (since one is initialized by default)
+    if (contactsList.children.length >= MAX_CONTACTS) {
+      addContactBtn.disabled = true;
+    } else {
+      addContactBtn.disabled = false;
     }
-
-    // Rerun the original logic in the file selector listener (which calls the backend)
-    handleNightModeFileSelect(event);
   }
 
   // ========================================
-  // REST OF LOGIC (KEPT FOR COMPLETENESS)
+  // CAPTURE HISTORY LOGIC
   // ========================================
-
-  /**
-   * Clears all status and result messages for the capture feature.
-   */
-  function clearCaptureMessages() {
-    uploadError.classList.add("hidden");
-    captureSuccess.classList.add("hidden");
-    extractedPlate.textContent = "---";
-    photoTimestamp.textContent = "---";
-    photoLocation.textContent = "---";
-  }
-
-  function displayImagePreview(dataURL) {
-    // Clear preview area
-    previewArea.innerHTML = "";
-    const photoMetadata = document.getElementById("photoMetadata");
-    if (photoMetadata) photoMetadata.classList.add("hidden"); // Ensure metadata is hidden first
-    previewArea.classList.add("has-image");
-    const img = document.createElement("img");
-    img.src = dataURL;
-    previewArea.appendChild(img);
-  }
-
-  function showUploadError(message) {
-    uploadError.textContent = message;
-    uploadError.classList.remove("hidden");
-  }
 
   /**
    * Fetches and displays the user's auto number capture history.
@@ -580,7 +796,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="history-location">📍 ${item.location}</div>
                     <div class="history-time">🕒 ${dateStr} at ${timeStr}</div>
                 </div>
-                <a href="${locationService.generateGoogleMapsUrl(
+                <a href="${window.locationService.generateGoogleMapsUrl(
                   item.latitude,
                   item.longitude
                 )}" target="_blank" class="history-map-link">
@@ -593,49 +809,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ========================================
-  // TRIP SHARING LOGIC (REMAINS THE SAME)
+  // UTILITY FUNCTIONS
   // ========================================
-
-  function addContactField() {
-    const contactDiv = document.createElement("div");
-    contactDiv.className = "contact-item";
-    contactDiv.innerHTML = `
-            <input type="text" placeholder="Phone or Email">
-            <button type="button" class="remove-btn">✕</button>
-        `;
-
-    // Attach remove event listener
-    const removeBtn = contactDiv.querySelector(".remove-btn");
-    removeBtn.addEventListener("click", function () {
-      removeContactField(contactDiv);
-    });
-
-    contactsList.appendChild(contactDiv);
-    contactCount++;
-    updateAddButtonState();
-  }
-
-  function removeContactField(element) {
-    element.remove();
-    contactCount--;
-    updateAddButtonState();
-  }
-
-  function updateAddButtonState() {
-    if (contactCount >= MAX_CONTACTS) {
-      addContactBtn.disabled = true;
-    } else {
-      addContactBtn.disabled = false;
-    }
-  }
 
   function showNotification(message, type) {
     console.log(`[${type.toUpperCase()}] ${message}`);
   }
-
-  // ========================================
-  // UTILITY FUNCTIONS (REMAINS THE SAME)
-  // ========================================
 
   function formatCoordinates(lat, lng) {
     return "Lat: " + lat + ", Long: " + lng;
@@ -669,10 +848,4 @@ document.addEventListener("DOMContentLoaded", function () {
     const seconds = String(date.getSeconds()).padStart(2, "0");
     return hours + ":" + minutes + ":" + seconds;
   }
-
-  // ========================================
-  // SOS LOGIC (REMAINS THE SAME)
-  // ========================================
-
-  // ... (omitted for brevity)
 });
