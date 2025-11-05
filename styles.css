@@ -445,15 +445,19 @@ ul {
 }
 
 /* ========================================
-   Navigation Bar
+   Navigation Bar - Modern Glass Design
    ======================================== */
 .navbar {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background-color: var(--color-white);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-backdrop);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     height: var(--navbar-height);
+    transition: all var(--transition-normal) ease;
 }
 
 .nav-container {
@@ -467,41 +471,62 @@ ul {
 }
 
 .nav-brand {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--color-text-primary);
+    font-size: 20px;
+    font-weight: var(--font-weight-extrabold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
 }
 
 .nav-links {
     display: flex;
-    gap: 32px;
+    gap: 2rem;
     align-items: center;
 }
 
 .nav-links a {
     font-size: 16px;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
-    transition: color 0.3s ease;
+    transition: all var(--transition-normal) ease;
     position: relative;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-md);
+}
+
+.nav-links a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    transition: all var(--transition-normal) ease;
+    transform: translateX(-50%);
+    border-radius: var(--border-radius-full);
 }
 
 .nav-links a:hover {
     color: var(--color-primary);
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.nav-links a:hover::before {
+    width: 80%;
 }
 
 .nav-links a.active {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary);
+    background: rgba(102, 126, 234, 0.15);
 }
 
-.nav-links a.active::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background-color: var(--color-primary);
+.nav-links a.active::before {
+    width: 80%;
 }
 
 /* Hamburger Menu Icon */
