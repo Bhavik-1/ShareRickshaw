@@ -92,44 +92,73 @@
     </section>
 
     <!-- Calculator Form Section -->
-    <section class="calculator-section">
-        <div class="calculator-card">
-            <h1 class="page-title">Auto Rickshaw Fare Calculator</h1>
-            <p class="subtitle">Calculate your fare based on Mumbai government-approved rates</p>
+    <section class="calculator-section" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 4rem 2rem;">
+        <div class="card-modern" style="max-width: 700px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <div style="display: inline-flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="width: 80px; height: 80px; background: var(--gradient-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);">
+                        💰
+                    </div>
+                </div>
+                <h1 class="page-title" style="color: var(--color-text-primary); margin-bottom: 1rem;">Smart Fare Calculator</h1>
+                <p class="subtitle" style="color: var(--color-text-secondary); font-size: 1.1rem;">Calculate your fare with precision and confidence</p>
+            </div>
 
             <form id="fareCalculatorForm">
-                <!-- Distance Input -->
-                <div class="form-group">
-                    <label for="distance">Distance (km)</label>
-                    <input type="number" id="distance" name="distance"
-                           placeholder="Enter distance in km"
-                           min="0" step="0.1" required>
+                <!-- Enhanced Distance Input -->
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label for="distance" style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        📏 Distance Traveled
+                    </label>
+                    <div style="position: relative;">
+                        <input type="number" id="distance" name="distance" class="input-modern"
+                               placeholder="Enter distance in kilometers"
+                               min="0" step="0.1" required>
+                        <div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--color-text-light); font-weight: var(--font-weight-medium);">
+                            km
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Waiting Time Input -->
-                <div class="form-group">
-                    <label for="waitingTime">Waiting Time (minutes)</label>
-                    <input type="number" id="waitingTime" name="waitingTime"
-                           placeholder="Enter waiting time"
-                           min="0" step="1" value="0">
+                <!-- Enhanced Waiting Time Input -->
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label for="waitingTime" style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        ⏱️ Waiting Time
+                    </label>
+                    <div style="position: relative;">
+                        <input type="number" id="waitingTime" name="waitingTime" class="input-modern"
+                               placeholder="Enter waiting time"
+                               min="0" step="1" value="0">
+                        <div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--color-text-light); font-weight: var(--font-weight-medium);">
+                            min
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Time of Day Dropdown -->
-                <div class="form-group">
-                    <label for="timeOfDay">Time of Day</label>
-                    <select id="timeOfDay" name="timeOfDay">
-                        <option value="normal">Normal Hours (5 AM - 12 AM)</option>
-                        <option value="night">Night Hours (12 AM - 5 AM) - 25% extra</option>
+                <!-- Enhanced Time of Day Dropdown -->
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label for="timeOfDay" style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        🕐 Time of Travel
+                    </label>
+                    <select id="timeOfDay" name="timeOfDay" class="input-modern" style="cursor: pointer;">
+                        <option value="normal">☀️ Normal Hours (5:00 AM - 12:00 AM)</option>
+                        <option value="night">🌙 Night Hours (12:00 AM - 5:00 AM) - 25% surcharge</option>
                     </select>
                 </div>
 
-                <!-- Submit Button -->
-                <button type="submit" id="calculateBtn" class="btn btn-primary">
-                    Calculate Fare
+                <!-- Enhanced Submit Button -->
+                <button type="submit" id="calculateBtn" class="gradient-button" style="width: 100%; font-size: 1.1rem; padding: 18px 24px; margin-bottom: 1.5rem;">
+                    <span style="display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                        <span>🧮</span>
+                        <span>Calculate Fare</span>
+                    </span>
                 </button>
 
-                <!-- Error Message (hidden by default) -->
-                <div class="error-message" id="errorMessage"></div>
+                <!-- Enhanced Error Message -->
+                <div class="error-message" id="errorMessage" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border: 1px solid #fca5a5; border-radius: var(--border-radius-lg); padding: 1rem 1.5rem; color: #dc2626; display: none; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.2rem;">⚠️</span>
+                    <span id="errorText"></span>
+                </div>
             </form>
 
             <!-- Results Container (hidden by default) -->
