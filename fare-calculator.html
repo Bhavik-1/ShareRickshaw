@@ -161,40 +161,162 @@
                 </div>
             </form>
 
-            <!-- Results Container (hidden by default) -->
-            <div class="results-container" id="resultsContainer">
-                <h2 class="section-heading">Fare Breakdown</h2>
-
-                <!-- Base Fare Card (always visible after calculation) -->
-                <div class="charge-card" id="baseFareCard">
-                    <span class="charge-label">Base Fare (1.5 km)</span>
-                    <span class="charge-value">₹26.00</span>
+            <!-- Enhanced Results Container (hidden by default) -->
+            <div class="results-container" id="resultsContainer" style="margin-top: 3rem; opacity: 0; transition: opacity var(--transition-normal) ease;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="display: inline-flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div style="width: 40px; height: 40px; background: var(--gradient-success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                            ✅
+                        </div>
+                        <h2 class="section-heading" style="margin: 0; font-size: 1.75rem;">Your Fare Breakdown</h2>
+                    </div>
                 </div>
 
-                <!-- Distance Charge Card (conditional) -->
-                <div class="charge-card" id="distanceCard" style="display: none;">
-                    <span class="charge-label" id="distanceLabel">Distance Charge</span>
-                    <span class="charge-value" id="distanceValue">₹0.00</span>
-                </div>
+                <div style="display: grid; gap: 1rem;">
+                    <!-- Base Fare Card (always visible after calculation) -->
+                    <div class="glass-card" id="baseFareCard" style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-left: 4px solid var(--color-primary); animation: slideInLeft 0.5s ease-out;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                🚗
+                            </div>
+                            <div>
+                                <div style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);">Base Fare</div>
+                                <div style="font-size: 0.875rem; color: var(--color-text-secondary);">First 1.5 km</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: var(--font-weight-bold); color: var(--color-primary);">₹26.00</div>
+                    </div>
 
-                <!-- Waiting Charge Card (conditional) -->
-                <div class="charge-card" id="waitingCard" style="display: none;">
-                    <span class="charge-label" id="waitingLabel">Waiting Charge</span>
-                    <span class="charge-value" id="waitingValue">₹0.00</span>
-                </div>
+                    <!-- Distance Charge Card (conditional) -->
+                    <div class="glass-card" id="distanceCard" style="display: none; justify-content: space-between; align-items: center; padding: 1.5rem; border-left: 4px solid var(--color-accent); animation: slideInLeft 0.5s ease-out 0.1s backwards;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; background: var(--gradient-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                📏
+                            </div>
+                            <div>
+                                <div style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);" id="distanceLabel">Distance Charge</div>
+                                <div style="font-size: 0.875rem; color: var(--color-text-secondary);" id="distanceSublabel">Additional km traveled</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: var(--font-weight-bold); color: var(--color-accent);" id="distanceValue">₹0.00</div>
+                    </div>
 
-                <!-- Night Surcharge Card (conditional) -->
-                <div class="charge-card" id="nightCard" style="display: none;">
-                    <span class="charge-label">Night Surcharge (25%)</span>
-                    <span class="charge-value" id="nightValue">₹0.00</span>
-                </div>
+                    <!-- Waiting Charge Card (conditional) -->
+                    <div class="glass-card" id="waitingCard" style="display: none; justify-content: space-between; align-items: center; padding: 1.5rem; border-left: 4px solid var(--color-warning); animation: slideInLeft 0.5s ease-out 0.2s backwards;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; background: var(--gradient-warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                ⏱️
+                            </div>
+                            <div>
+                                <div style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);" id="waitingLabel">Waiting Charge</div>
+                                <div style="font-size: 0.875rem; color: var(--color-text-secondary);" id="waitingSublabel">Time spent waiting</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: var(--font-weight-bold); color: var(--color-warning);" id="waitingValue">₹0.00</div>
+                    </div>
 
-                <!-- Total Card (always visible after calculation) -->
-                <div class="total-card">
-                    <div class="total-label">TOTAL FARE</div>
-                    <div class="total-amount" id="totalAmount">₹0.00</div>
+                    <!-- Night Surcharge Card (conditional) -->
+                    <div class="glass-card" id="nightCard" style="display: none; justify-content: space-between; align-items: center; padding: 1.5rem; border-left: 4px solid var(--color-secondary); animation: slideInLeft 0.5s ease-out 0.3s backwards;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; background: var(--gradient-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                🌙
+                            </div>
+                            <div>
+                                <div style="font-weight: var(--font-weight-semibold); color: var(--color-text-primary);">Night Surcharge</div>
+                                <div style="font-size: 0.875rem; color: var(--color-text-secondary);">25% extra (12 AM - 5 AM)</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: var(--font-weight-bold); color: var(--color-secondary);" id="nightValue">₹0.00</div>
+                    </div>
+
+                    <!-- Enhanced Total Card -->
+                    <div style="background: var(--gradient-success); border-radius: var(--border-radius-xl); padding: 2rem; text-align: center; margin-top: 1.5rem; position: relative; overflow: hidden; animation: slideInUp 0.6s ease-out 0.4s backwards; box-shadow: 0 15px 35px rgba(67, 233, 123, 0.3);">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,%3Csvg width=\"30\" height=\"30\" viewBox=\"0 0 30 30\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Cpath d=\"M15 15c0-3-2.5-5.5-5.5-5.5S4 12 4 15s2.5 5.5 5.5 5.5 5.5-2.5 5.5-5.5zm6 0c0-3-2.5-5.5-5.5-5.5S10 12 10 15s2.5 5.5 5.5 5.5 5.5-2.5 5.5-5.5z\"/%3E%3C/g%3E%3C/svg%3E'); opacity: 0.3;"></div>
+
+                        <div style="position: relative; z-index: 1;">
+                            <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <div style="width: 30px; height: 30px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                                    💰
+                                </div>
+                                <div class="total-label" style="color: white; opacity: 0.9; font-weight: var(--font-weight-semibold); letter-spacing: 2px;">TOTAL FARE</div>
+                            </div>
+                            <div class="total-amount" id="totalAmount" style="color: white; font-size: 3rem; font-weight: var(--font-weight-extrabold); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin: 0; position: relative; animation: pulse-glow 2s ease-in-out infinite;">
+                                ₹0.00
+                            </div>
+                            <div style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center;">
+                                <button onclick="copyFareDetails()" class="gradient-button" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: var(--glass-backdrop); border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.75rem 1.5rem; font-size: 0.9rem;">
+                                    📋 Copy Details
+                                </button>
+                                <button onclick="shareFareDetails()" class="gradient-button" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: var(--glass-backdrop); border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.75rem 1.5rem; font-size: 0.9rem;">
+                                    📤 Share Fare
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <script>
+    // Add copy and share functionality
+    function copyFareDetails() {
+        const details = document.getElementById('resultsContainer').innerText;
+        navigator.clipboard.writeText(details).then(() => {
+            showNotification('Fare details copied to clipboard!');
+        });
+    }
+
+    function shareFareDetails() {
+        const details = document.getElementById('resultsContainer').innerText;
+        if (navigator.share) {
+            navigator.share({
+                title: 'Mumbai Auto Fare Calculation',
+                text: details
+            });
+        } else {
+            copyFareDetails();
+        }
+    }
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification-toast';
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--gradient-success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);
+            z-index: 10000;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    // Add animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+    `;
+    document.head.appendChild(style);
+    </script>
         </div>
     </section>
 
