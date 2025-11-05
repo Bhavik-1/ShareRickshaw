@@ -713,17 +713,27 @@
 
       <section class="map-container">
         <div id="loading-spinner" class="spinner-overlay">
-          <div class="spinner"></div>
-          <p>Loading map...</p>
+          <div class="spinner-container">
+            <div class="spinner"></div>
+            <p>Loading interactive map...</p>
+            <div class="loading-subtitle">Please wait while we locate all share auto stands</div>
+          </div>
         </div>
         <div id="map"></div>
       </section>
 
       <section class="stands-list-section">
-        <h2 id="stands-heading">All Stands</h2>
+        <div class="stands-list-header">
+          <h2 id="stands-heading">All Share Auto Stands</h2>
+          <p class="stands-subtitle">Discover convenient pickup locations across Mumbai</p>
+        </div>
         <div id="stands-grid" class="stands-grid"></div>
-        <div id="no-results" class="no-results" style="display: none">
-          <p>No stands or routes found matching your search.</p>
+        <div id="no-results" class="no-results" style="display: none; padding: 4rem 2rem; text-align: center;">
+          <div style="max-width: 400px; margin: 0 auto;">
+            <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;">🗺️</div>
+            <h3 style="color: var(--color-text-primary); font-size: 1.5rem; margin-bottom: 1rem;">No stands found</h3>
+            <p style="color: var(--color-text-secondary);">Try adjusting your search terms or browse all stands using the filter buttons above.</p>
+          </div>
         </div>
       </section>
     </main>
