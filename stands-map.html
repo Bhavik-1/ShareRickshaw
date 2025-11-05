@@ -693,11 +693,22 @@
       </section>
 
       <section class="search-section">
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Search stands or routes..."
-        />
+        <div class="search-container">
+          <div class="search-icon">🔍</div>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search stands, routes, or locations..."
+          />
+
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All Stands</button>
+            <button class="filter-btn" data-filter="western">Western Line</button>
+            <button class="filter-btn" data-filter="central">Central Line</button>
+            <button class="filter-btn" data-filter="harbor">Harbor Line</button>
+            <button class="filter-btn" data-filter="popular">Popular</button>
+          </div>
+        </div>
       </section>
 
       <section class="map-container">
