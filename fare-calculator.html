@@ -44,17 +44,50 @@
         </ul>
     </div>
 
-    <!-- Fare Information Card Section -->
-    <section class="info-section">
-        <div class="info-card">
-            <h2 class="info-title">Official Fare Rates</h2>
-            <ul class="rate-list">
-                <li>Base fare: <strong>₹26</strong> for first <strong>1.5 km</strong></li>
-                <li>Additional distance: <strong>₹17.14</strong> per km</li>
-                <li>Waiting charge: <strong>₹3</strong> per minute</li>
-                <li>Night surcharge: <strong>25%</strong> extra (<strong>12 AM - 5 AM</strong>)</li>
-            </ul>
-            <p class="rate-note">Rates effective from February 2025 (Maharashtra Govt.)</p>
+    <!-- Modern Page Header -->
+    <header class="page-header-modern">
+        <div class="hero-container">
+            <h1>Intelligent Fare Calculator</h1>
+            <p class="subtitle">Government-approved rates with real-time calculations</p>
+        </div>
+    </header>
+
+    <!-- Enhanced Information Section -->
+    <section class="info-section" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 4rem 2rem;">
+        <div class="glass-card" style="max-width: 800px; margin: 0 auto; padding: 3rem; background: var(--gradient-primary); color: white; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,%3Csvg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.08\"%3E%3Cpath d=\"M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z\"/%3E%3C/g%3E%3C/svg%3E');"></div>
+
+            <div style="position: relative; z-index: 1; text-align: center;">
+                <div style="display: inline-flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="width: 60px; height: 60px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        ✅
+                    </div>
+                    <h2 class="info-title" style="color: white; font-size: 2rem; margin: 0;">Government Approved Rates</h2>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <div class="rate-item-modern" style="background: rgba(255, 255, 255, 0.15); padding: 1.5rem; border-radius: var(--border-radius-lg); backdrop-filter: var(--glass-backdrop);">
+                        <div style="font-size: 2rem; font-weight: var(--font-weight-bold); margin-bottom: 0.5rem;">₹26</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Base Fare (1.5 km)</div>
+                    </div>
+                    <div class="rate-item-modern" style="background: rgba(255, 255, 255, 0.15); padding: 1.5rem; border-radius: var(--border-radius-lg); backdrop-filter: var(--glass-backdrop);">
+                        <div style="font-size: 2rem; font-weight: var(--font-weight-bold); margin-bottom: 0.5rem;">₹17.14</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Per km after 1.5 km</div>
+                    </div>
+                    <div class="rate-item-modern" style="background: rgba(255, 255, 255, 0.15); padding: 1.5rem; border-radius: var(--border-radius-lg); backdrop-filter: var(--glass-backdrop);">
+                        <div style="font-size: 2rem; font-weight: var(--font-weight-bold); margin-bottom: 0.5rem;">₹3</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Per minute waiting</div>
+                    </div>
+                    <div class="rate-item-modern" style="background: rgba(255, 255, 255, 0.15); padding: 1.5rem; border-radius: var(--border-radius-lg); backdrop-filter: var(--glass-backdrop);">
+                        <div style="font-size: 2rem; font-weight: var(--font-weight-bold); margin-bottom: 0.5rem;">25%</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Night surcharge</div>
+                    </div>
+                </div>
+
+                <p class="rate-note" style="color: rgba(255, 255, 255, 0.8); margin-top: 2rem; font-size: 0.9rem;">
+                    📅 Rates effective from February 2025 • Maharashtra Government Approved
+                </p>
+            </div>
         </div>
     </section>
 
