@@ -515,6 +515,16 @@ function createRouteCard(route, index) {
     .replace("(", "")
     .replace(")", "")}`;
 
+  // FIX: Change route card styling for the two remaining options
+  let cardClass = "";
+  if (route.type.includes("Direct Auto")) {
+    cardClass = "direct-auto";
+  } else if (route.type.includes("Multimodal")) {
+    cardClass = "train-combo";
+  }
+  card.classList.add(cardClass);
+  // End Fix
+
   const cost =
     route.estimatedCostRupees !== "N/A"
       ? `₹${route.estimatedCostRupees}`
@@ -735,7 +745,7 @@ function setLoading(isLoading) {
     routeLoading.innerHTML = `
         <div class="spinner-overlay" style="position: relative; height: 100px; padding: 0;">
             <div class="spinner"></div>
-            <p>Finding the best multimodal routes (using Gemini AI...)</p>
+            <p>Finding and calculating the best route options...</p>
         </div>
     `;
     routeLoading.style.display = "block";
