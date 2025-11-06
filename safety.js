@@ -12,8 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const TRACKING_INTERVAL_MS = 120000; // 2 minutes
   const NIGHT_START_HOUR = 22; // 10 PM (Kept for reference, but no longer enforces restriction)
   const NIGHT_END_HOUR = 5; // 5 AM (Kept for reference, but no longer enforces restriction)
-  let contactCount = 1;
-  const MAX_CONTACTS = 5;
+  // Removed contactCount and MAX_CONTACTS
   const API_BASE_URL = window.API_BASE_URL; // Global API URL from auth.js
   let nightModePlate = null; // Stores the confirmed license plate for tracking
   let isNightModeCapture = false; // Flag to track if the capture is part of the Night Mode flow
@@ -51,13 +50,13 @@ document.addEventListener("DOMContentLoaded", function () {
     "closeCaptureSourceModal"
   ); // Renamed for clarity
 
-  // Feature 3: Trip Sharing
-  const tripSharingForm = document.getElementById("tripSharingForm");
-  const pickupLocationInput = document.getElementById("pickupLocation");
-  const destinationInput = document.getElementById("destination");
-  const autoNumberInput = document.getElementById("autoNumber");
-  const contactsList = document.getElementById("contactsList");
-  const addContactBtn = document.getElementById("addContactBtn");
+  // Feature 3: Trip Sharing (REMOVED)
+  // const tripSharingForm = document.getElementById("tripSharingForm");
+  // const pickupLocationInput = document.getElementById("pickupLocation");
+  // const destinationInput = document.getElementById("destination");
+  // const autoNumberInput = document.getElementById("autoNumber");
+  // const contactsList = document.getElementById("contactsList");
+  // const addContactBtn = document.getElementById("addContactBtn");
 
   // Feature 4: Night Mode Safety
   const nightModeCard = document.getElementById("nightModeCard");
@@ -80,11 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialization
   // ========================================
 
-  if (contactsList.children.length === 0) {
-    addContactField(); // Ensure one contact field is always present initially
-  } else {
-    updateAddButtonState(); // Update state if fields exist from previous state/template
-  }
+  // Removed initial contact field logic
 
   loadCaptureHistory();
   window.loadCaptureHistory = loadCaptureHistory;
@@ -92,10 +87,10 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeNightMode();
 
   // ========================================
-  // FIX: ADD MISSING EVENT LISTENERS HERE
+  // EVENT LISTENERS
   // ========================================
 
-  // Feature 1: Emergency SOS (FIXED)
+  // Feature 1: Emergency SOS
   if (sosButton) {
     sosButton.addEventListener("click", handleSosButton);
   }
@@ -147,15 +142,9 @@ document.addEventListener("DOMContentLoaded", function () {
     fileInputGallery.addEventListener("change", handleFileSelect);
   }
 
-  // Feature 3: Trip Sharing (FIXED)
-  if (addContactBtn) {
-    addContactBtn.addEventListener("click", addContactField);
-  }
-  if (tripSharingForm) {
-    tripSharingForm.addEventListener("submit", handleTripSharingSubmit);
-  }
+  // Feature 3: Trip Sharing (REMOVED LISTENERS)
 
-  // Feature 4: Night Mode Toggle (FIXED)
+  // Feature 4: Night Mode Toggle
   if (nightModeToggle) {
     nightModeToggle.addEventListener("click", function () {
       toggleNightMode();
@@ -304,116 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // --- Trip Sharing Handler ---
-
-  async function handleTripSharingSubmit(e) {
-    e.preventDefault();
-
-    // Clear previous errors
-    document
-      .querySelectorAll("#tripSharingForm .error-message")
-      .forEach((el) => el.classList.add("hidden"));
-
-    const pickup = pickupLocationInput.value.trim();
-    const destination = destinationInput.value.trim();
-    const autoNumber = autoNumberInput.value.trim();
-
-    // Collect all contacts (phone or email)
-    const rawContacts = Array.from(
-      contactsList.querySelectorAll('input[type="text"]')
-    ).map((input) => input.value.trim());
-
-    const validContacts = rawContacts.filter((contact) => contact.length > 0);
-
-    let isValid = true;
-    let location;
-    const shareTripBtn = tripSharingForm.querySelector('button[type="submit"]');
-
-    if (pickup.length < 5) {
-      document.getElementById("pickupError").textContent =
-        "Pickup location must be at least 5 characters.";
-      document.getElementById("pickupError").classList.remove("hidden");
-      isValid = false;
-    }
-
-    if (destination.length < 5) {
-      document.getElementById("destinationError").textContent =
-        "Destination must be at least 5 characters.";
-      document.getElementById("destinationError").classList.remove("hidden");
-      isValid = false;
-    }
-
-    // Basic auto number validation (optional, allow empty)
-    if (autoNumber.length > 0 && autoNumber.length < 5) {
-      document.getElementById("autoNumberError").textContent =
-        "Auto number is too short (min 5 chars).";
-      document.getElementById("autoNumberError").classList.remove("hidden");
-      isValid = false;
-    }
-
-    if (validContacts.length === 0) {
-      document.getElementById("pickupError").textContent =
-        "Please add at least one contact (phone or email).";
-      document.getElementById("pickupError").classList.remove("hidden");
-      isValid = false;
-    }
-
-    if (!isValid) return;
-
-    // Show loading state
-    shareTripBtn.disabled = true;
-    shareTripBtn.textContent = "Sharing...";
-
-    try {
-      // 1. Get current location for the share
-      location = await locationService.getCurrentLocation();
-      const { latitude, longitude, accuracy } = location;
-
-      // 2. Format a simple link for SMS/WhatsApp
-      const googleMapsUrl = locationService.generateGoogleMapsUrl(
-        latitude,
-        longitude
-      );
-      const mapLinkShort = googleMapsUrl.substring(0, 50) + "..."; // Shorten link for display
-
-      // 3. Construct the share message
-      const shareMessage = `I'm on a trip via Share Rickshaw. Pickup: ${pickup}, Destination: ${destination}. Auto No: ${
-        autoNumber || "N/A"
-      }. My current live location: ${googleMapsUrl}`;
-
-      // 4. Send to Backend for SMS/Email sharing to contacts
-      // NOTE: The backend API /safety/share-trip does not exist in the provided files.
-      // We will simulate the backend call and notify the user about the simulation.
-
-      // Placeholder for real API call:
-      // const response = await fetch(`${API_BASE_URL}/safety/share-trip`, { ... });
-
-      // Since the backend endpoint for this feature is missing, we use console logging
-      // and a local success notification.
-
-      console.log("SIMULATED API CALL: Trip Share Triggered");
-      console.log("Message Sent:", shareMessage);
-      console.log("Shared with contacts:", validContacts);
-
-      showNotification(
-        `Trip details simulated: Shared via SMS/Email to ${validContacts.length} contacts.`,
-        "success"
-      );
-      // Clear form after success
-      tripSharingForm.reset();
-      contactsList.innerHTML = ""; // Clear dynamic contacts
-      addContactField(); // Re-add one empty field
-    } catch (error) {
-      console.error("Trip sharing failed:", error);
-      document.getElementById("pickupError").textContent =
-        error.message ||
-        "Failed to get location for sharing. Please try again.";
-      document.getElementById("pickupError").classList.remove("hidden");
-    } finally {
-      shareTripBtn.disabled = false;
-      shareTripBtn.textContent = "Share Trip Details";
-    }
-  }
+  // --- Trip Sharing Handler (REMOVED) ---
 
   // --- Capture Handlers (Keep original logic but ensure the handler uses fileInput.click() and is hooked) ---
 
@@ -792,50 +672,11 @@ document.addEventListener("DOMContentLoaded", function () {
     nightModeStatus.classList.add("hidden");
   }
 
-  // --- Night Mode Modal Handlers (REMOVED: Replaced by captureSourceModal logic) ---
-
   // ========================================
-  // TRIP SHARING LOGIC
+  // TRIP SHARING LOGIC (REMOVED)
   // ========================================
 
-  function addContactField() {
-    const contactDiv = document.createElement("div");
-    contactDiv.className = "contact-item";
-    // FIX: Changed input type to allow both phone and email, placeholder is updated
-    contactDiv.innerHTML = `
-            <input type="text" placeholder="Phone number (10 digits) or Email" pattern="^(\\d{10}|[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,4})$">
-            <button type="button" class="remove-btn">✕</button>
-        `;
-
-    // Attach remove event listener
-    const removeBtn = contactDiv.querySelector(".remove-btn");
-    removeBtn.addEventListener("click", function () {
-      removeContactField(contactDiv);
-    });
-
-    contactsList.appendChild(contactDiv);
-    contactCount++;
-    updateAddButtonState();
-  }
-
-  function removeContactField(element) {
-    element.remove();
-    contactCount--;
-    updateAddButtonState();
-    // FIX: Clear error messages if a field is removed
-    document
-      .querySelectorAll("#tripSharingForm .error-message")
-      .forEach((el) => el.classList.add("hidden"));
-  }
-
-  function updateAddButtonState() {
-    // Only allow up to MAX_CONTACTS fields
-    if (contactsList.children.length >= MAX_CONTACTS) {
-      addContactBtn.disabled = true;
-    } else {
-      addContactBtn.disabled = false;
-    }
-  }
+  // Removed addContactField, removeContactField, updateAddButtonState functions
 
   // ========================================
   // CAPTURE HISTORY LOGIC
