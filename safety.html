@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Safety features for share auto travelers - Emergency SOS, auto number capture, trip sharing, and night mode tracking."
+      content="Safety features for share auto travelers - Emergency SOS, auto number capture, and night mode tracking."
     />
     <title>Safety Features - Mumbai Share Auto Finder</title>
     <link rel="stylesheet" href="styles.css" />
@@ -231,7 +231,10 @@
     <section class="features-section">
       <div class="features-container">
         <h2 class="section-heading">Auto Safety Tools</h2>
-        <div class="features-grid">
+        <div
+          class="features-grid"
+          style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))"
+        >
           <!-- Feature 1: Emergency SOS -->
           <div class="feature-card">
             <h3>Emergency SOS</h3>
@@ -291,55 +294,7 @@
             </div>
           </div>
 
-          <!-- Feature 3: Trip Sharing -->
-          <div class="feature-card">
-            <h3>Trip Sharing</h3>
-            <form id="tripSharingForm">
-              <div class="form-group">
-                <label for="pickupLocation">Pick-up Location</label>
-                <input
-                  type="text"
-                  id="pickupLocation"
-                  placeholder="Enter pick-up location"
-                />
-                <div class="error-message" id="pickupError"></div>
-              </div>
-              <div class="form-group">
-                <label for="destination">Destination</label>
-                <input
-                  type="text"
-                  id="destination"
-                  placeholder="Enter destination"
-                />
-                <div class="error-message" id="destinationError"></div>
-              </div>
-              <div class="form-group">
-                <label for="autoNumber">Auto Number</label>
-                <input
-                  type="text"
-                  id="autoNumber"
-                  placeholder="e.g., MH 02 AB 1234"
-                />
-                <div class="error-message" id="autoNumberError"></div>
-              </div>
-              <div class="contacts-section">
-                <h4>Emergency Contacts</h4>
-                <div id="contactsList"></div>
-                <button
-                  type="button"
-                  class="add-contact-btn"
-                  id="addContactBtn"
-                >
-                  + Add Contact
-                </button>
-              </div>
-              <button type="submit" class="btn btn-primary full-width">
-                Share Trip Details
-              </button>
-            </form>
-          </div>
-
-          <!-- Feature 4: Night Mode Safety -->
+          <!-- Feature 3: Night Mode Safety -->
           <!-- Hidden by default, shown by JS only if time criteria are met -->
           <div class="feature-card hidden" id="nightModeCard">
             <h3>Night Mode Safety</h3>
