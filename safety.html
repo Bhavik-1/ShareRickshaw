@@ -113,8 +113,8 @@
         }
       }
 
-      /* NEW MODAL STYLES */
-      .capture-modal-overlay {
+      /* MODAL STYLES (Capture Source Modal - NEW) */
+      .capture-source-modal {
         position: fixed;
         top: 0;
         left: 0;
@@ -136,20 +136,46 @@
         text-align: center;
       }
       .capture-modal-content h3 {
-        color: #d32f2f;
+        color: #1a1a1a;
         margin-bottom: 15px;
+        font-size: 1.5rem;
       }
       .capture-modal-content p {
-        color: #333;
+        color: #666;
         margin-bottom: 25px;
+        font-size: 1rem;
       }
       .capture-modal-buttons {
         display: flex;
+        flex-direction: column;
         gap: 15px;
         justify-content: center;
       }
       .capture-modal-buttons button {
         flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      /* Existing modal for SOS */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-overlay.show {
+        display: flex;
       }
     </style>
   </head>
@@ -228,9 +254,17 @@
             <button class="upload-button" id="uploadButton">
               📷 Capture/Upload Plate Photo
             </button>
+            <!-- Hidden inputs for camera/gallery. capture="camera" forces camera on mobile. -->
             <input
               type="file"
-              id="fileInput"
+              id="fileInputCamera"
+              accept="image/*"
+              capture="camera"
+              style="display: none"
+            />
+            <input
+              type="file"
+              id="fileInputGallery"
               accept="image/*"
               style="display: none"
             />
@@ -368,31 +402,37 @@
       </div>
     </div>
 
-    <!-- NEW MODAL: Night Mode Auto Capture Prompt -->
-    <div class="modal-overlay hidden" id="captureModal">
+    <!-- NEW MODAL: Auto Capture Source Selector -->
+    <div class="modal-overlay hidden" id="captureSourceModal">
       <div class="capture-modal-content">
-        <h3>Capture Auto Number?</h3>
+        <h3>Choose Photo Source</h3>
         <p>
-          For your safety, we recommend capturing the license plate to share
-          with your emergency contacts during night tracking.
+          Select whether to take a new photo with your camera or choose one from
+          your gallery.
         </p>
         <div class="capture-modal-buttons">
-          <button class="btn-primary" id="captureModalYes">
-            Yes, Take Photo
+          <button class="btn-primary" id="selectCameraBtn">
+            📸 Take Photo with Camera
           </button>
-          <button class="btn-secondary" id="captureModalNo">
-            No, Skip Plate
+          <button
+            class="btn-secondary"
+            id="selectGalleryBtn"
+            style="background: #e0e0e0; color: #333"
+          >
+            🖼️ Select from Gallery
           </button>
         </div>
         <button
           class="modal-close"
-          id="captureModalClose"
+          id="closeCaptureSourceModal"
           style="position: absolute; top: 10px; right: 10px"
         >
           &times;
         </button>
       </div>
     </div>
+
+    <!-- Night Mode Capture Prompt (REMOVED: Old modal is replaced by inline logic) -->
 
     <!-- Footer -->
     <footer class="footer">
