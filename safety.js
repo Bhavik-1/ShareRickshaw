@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const MAX_CONTACTS = 5;
   const API_BASE_URL = window.API_BASE_URL; // Global API URL from auth.js
   let nightModePlate = null; // Stores the confirmed license plate for tracking
+  let isNightModeCapture = false; // Flag to track if the capture is part of the Night Mode flow
 
   // ========================================
   // DOM Element References
@@ -32,13 +33,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Feature 2: Auto Number Capture
   const uploadButton = document.getElementById("uploadButton");
-  const fileInput = document.getElementById("fileInput");
+  // NEW: Multiple file inputs for camera/gallery
+  const fileInputCamera = document.getElementById("fileInputCamera");
+  const fileInputGallery = document.getElementById("fileInputGallery");
   const previewArea = document.getElementById("previewArea");
   const extractedPlate = document.getElementById("extractedPlate");
   const photoTimestamp = document.getElementById("photoTimestamp");
   const photoLocation = document.getElementById("photoLocation");
   const uploadError = document.getElementById("uploadError");
   const captureSuccess = document.getElementById("captureSuccess");
+
+  // NEW: Capture Source Modal Elements
+  const captureSourceModal = document.getElementById("captureSourceModal");
+  const selectCameraBtn = document.getElementById("selectCameraBtn");
+  const selectGalleryBtn = document.getElementById("selectGalleryBtn");
+  const closeCaptureSourceModalBtn = document.getElementById(
+    "closeCaptureSourceModal"
+  ); // Renamed for clarity
 
   // Feature 3: Trip Sharing
   const tripSharingForm = document.getElementById("tripSharingForm");
@@ -65,18 +76,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const historyLoading = document.getElementById("historyLoading");
   const noHistoryMessage = document.getElementById("noHistoryMessage");
 
-  // NEW: Capture Modal Elements
-  const captureModal = document.getElementById("captureModal");
-  const captureModalYes = document.getElementById("captureModalYes");
-  const captureModalNo = document.getElementById("captureModalNo");
-  const captureModalClose = document.getElementById("captureModalClose");
-
   // ========================================
   // Initialization
   // ========================================
 
-  // We need to load initial contacts count from the profile or database later
-  // For now, ensure there is at least one input field for Trip Sharing
   if (contactsList.children.length === 0) {
     addContactField(); // Ensure one contact field is always present initially
   } else {
@@ -86,13 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
   loadCaptureHistory();
   window.loadCaptureHistory = loadCaptureHistory;
 
-  // NEW: Initial check for time and auto-start logic
   initializeNightMode();
-
-  // Setup Capture Modal Listeners
-  captureModalYes.addEventListener("click", handleCaptureModalYes);
-  captureModalNo.addEventListener("click", handleCaptureModalNo);
-  captureModalClose.addEventListener("click", closeCaptureModal);
 
   // ========================================
   // FIX: ADD MISSING EVENT LISTENERS HERE
@@ -111,10 +108,43 @@ document.addEventListener("DOMContentLoaded", function () {
     modalConfirm.addEventListener("click", handleConfirmSos);
   }
 
-  // Feature 2: Auto Number Capture (Trigger file input) (FIXED)
-  if (uploadButton && fileInput) {
-    uploadButton.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", handleFileSelect); // Use the combined handler
+  // Feature 2: Auto Number Capture (Trigger Source Modal)
+  if (uploadButton) {
+    uploadButton.addEventListener("click", () => openCaptureSourceModal(false));
+  }
+
+  // NEW: Capture Source Modal Handlers
+  if (selectCameraBtn) {
+    selectCameraBtn.addEventListener("click", () => {
+      closeCaptureSourceModal();
+      // Reset files first
+      fileInputCamera.value = "";
+      fileInputCamera.click();
+    });
+  }
+
+  if (selectGalleryBtn) {
+    selectGalleryBtn.addEventListener("click", () => {
+      closeCaptureSourceModal();
+      // Reset files first
+      fileInputGallery.value = "";
+      fileInputGallery.click();
+    });
+  }
+
+  if (closeCaptureSourceModalBtn) {
+    closeCaptureSourceModalBtn.addEventListener(
+      "click",
+      closeCaptureSourceModal
+    );
+  }
+
+  // Handle file selection from both inputs using the same handler
+  if (fileInputCamera) {
+    fileInputCamera.addEventListener("change", handleFileSelect);
+  }
+  if (fileInputGallery) {
+    fileInputGallery.addEventListener("change", handleFileSelect);
   }
 
   // Feature 3: Trip Sharing (FIXED)
@@ -130,6 +160,42 @@ document.addEventListener("DOMContentLoaded", function () {
     nightModeToggle.addEventListener("click", function () {
       toggleNightMode();
     });
+  }
+
+  // ========================================
+  // MODAL CONTROL FUNCTIONS
+  // ========================================
+
+  /**
+   * Opens the capture source selection modal.
+   * @param {boolean} isNightMode - True if triggered by Night Mode start.
+   */
+  function openCaptureSourceModal(isNightMode) {
+    if (!captureSourceModal) return;
+
+    isNightModeCapture = isNightMode; // Set the global flag
+    captureSourceModal.classList.remove("hidden");
+    captureSourceModal.classList.add("show");
+  }
+
+  /**
+   * Closes the capture source selection modal.
+   */
+  function closeCaptureSourceModal() {
+    // FIX: Check if captureSourceModal exists before trying to access its classList
+    if (!captureSourceModal) return;
+
+    // If we close the modal during the Night Mode flow, it means the user cancelled the capture.
+    // In this case, we proceed with tracking location only.
+    if (isNightModeCapture) {
+      nightModePlate = null;
+      startTrackingInterval();
+      showNightModeError(`Plate capture skipped. Tracking location only.`);
+    }
+
+    isNightModeCapture = false; // Reset flag
+    captureSourceModal.classList.remove("show");
+    captureSourceModal.classList.add("hidden");
   }
 
   // ========================================
@@ -382,12 +448,19 @@ document.addEventListener("DOMContentLoaded", function () {
    */
   async function handleFileSelect(event) {
     const file = event.target.files[0];
-    if (!file) return;
+    if (!file) {
+      // If the user cancels the file selection during Night Mode flow
+      if (isNightModeCapture) {
+        closeCaptureSourceModal(); // This also handles starting tracking without plate
+      }
+      return;
+    }
 
-    // Determine if we are in the Night Mode flow
-    const isNightModeFlow =
-      nightModeToggle.classList.contains("active") &&
-      nightModeInterval === null;
+    // Determine if we are in the Night Mode flow by checking the flag
+    const isNightModeFlow = isNightModeCapture;
+
+    // Reset the flag immediately to prepare for the next action
+    isNightModeCapture = false;
 
     clearCaptureMessages();
     uploadButton.disabled = true;
@@ -477,7 +550,8 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         }
 
-        fileInput.value = ""; // Clear file input
+        // Clear file input values to allow selection of the same file again
+        event.target.value = "";
         uploadButton.disabled = false;
         uploadButton.textContent = "📷 Capture/Upload Plate Photo";
       }
@@ -489,8 +563,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /**
    * Checks the time and enables/disables the Night Mode UI and auto-start.
-   * FIX: This function is simplified to always show the card and reset the state,
-   * making the feature always available for manual toggle.
    */
   function initializeNightMode() {
     nightModeCard.classList.remove("hidden"); // Always show the card
@@ -504,11 +576,8 @@ document.addEventListener("DOMContentLoaded", function () {
     nightModeStatus.style.color = "#1565c0";
   }
 
-  // FIX: Moved toggle listener setup to initialization section
-
   /**
    * Toggles Night Mode ON or OFF regardless of the time of day.
-   * FIX: Removed time-of-day restriction.
    */
   function toggleNightMode() {
     nightModeError.classList.add("hidden");
@@ -544,7 +613,8 @@ document.addEventListener("DOMContentLoaded", function () {
         );
       } else {
         // No recent plate, ask the user to capture now
-        captureModal.classList.remove("hidden");
+        // NEW: Open the source selection modal
+        openCaptureSourceModal(true);
       }
     } catch (error) {
       console.error("Error checking recent capture status:", error);
@@ -614,7 +684,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Reset plate variable and close modal
     nightModePlate = null;
-    closeCaptureModal();
+    closeCaptureSourceModal(); // Use the new close function
 
     if (resetUI) {
       nightModeToggle.classList.remove("active");
@@ -722,22 +792,7 @@ document.addEventListener("DOMContentLoaded", function () {
     nightModeStatus.classList.add("hidden");
   }
 
-  // --- Night Mode Modal Handlers ---
-  function closeCaptureModal() {
-    captureModal.classList.add("hidden");
-  }
-
-  function handleCaptureModalYes() {
-    closeCaptureModal();
-    // Directly trigger the photo capture mechanism (using the existing file input flow)
-    fileInput.click();
-  }
-
-  function handleCaptureModalNo() {
-    closeCaptureModal();
-    nightModePlate = null; // Confirm no plate
-    startTrackingInterval(); // Start tracking without plate
-  }
+  // --- Night Mode Modal Handlers (REMOVED: Replaced by captureSourceModal logic) ---
 
   // ========================================
   // TRIP SHARING LOGIC
@@ -860,10 +915,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function showNotification(message, type) {
     console.log(`[${type.toUpperCase()}] ${message}`);
-  }
-
-  function formatCoordinates(lat, lng) {
-    return "Lat: " + lat + ", Long: " + lng;
   }
 
   function formatDateTime(date) {
