@@ -5,166 +5,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Find the best multimodal travel options in Mumbai, combining direct auto, shared auto, and Western Line trains."
+      content="Safety features for share auto travelers - Emergency SOS, auto number capture, and night mode tracking."
     />
-    <title>Multimodal Route Finder - Mumbai Share Auto Finder</title>
+    <title>Safety Features - Mumbai Share Auto Finder</title>
     <link rel="stylesheet" href="styles.css" />
-    <!-- Leaflet CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
-    <!-- Leaflet Routing Machine CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
-    />
-    <!-- Nominatim Geocoding Control CSS (for Autocomplete UI) -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
-    />
     <style>
-      /* Custom styles for route finder page */
-      .route-finder-layout {
-        max-width: 1400px;
+      /* Styles for the new Capture History section */
+      .history-section {
+        padding: 40px 20px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 20px;
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
       }
-      #mapContainer {
-        height: 450px;
-        width: 100%;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        z-index: 1; /* Ensure map is above other elements if needed */
+
+      .history-section h2 {
+        font-size: 28px;
+        text-align: center;
+        margin-bottom: 30px;
+        color: var(--color-text-primary);
       }
-      .input-group {
+
+      #captureHistoryList {
         display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
+        flex-direction: column;
+        gap: 15px;
       }
-      .input-group .form-group {
-        flex: 1;
-        margin-bottom: 0;
-        position: relative;
-      }
-      .location-input-btn {
-        position: absolute;
-        right: 1px;
-        top: 1px;
-        height: calc(100% - 2px);
-        background: var(--color-teal);
-        color: white;
-        border: none;
-        border-radius: 0 8px 8px 0;
-        padding: 0 10px;
-        cursor: pointer;
-        transition: background 0.2s;
-        font-weight: 500;
-        line-height: 1.2;
-      }
-      .location-input-btn:hover {
-        background: #00695c;
-      }
-      .leaflet-control-container .leaflet-routing-container {
-        display: none !important; /* Hide OSRM output panel initially */
-      }
-      #resultsContainer {
-        padding: 20px;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      }
-      .route-option-card {
-        padding: 15px;
+
+      .history-card {
+        background: white;
+        border-left: 5px solid var(--color-primary);
         border-radius: 8px;
-        margin-bottom: 15px;
-        transition: transform 0.2s;
-        cursor: pointer;
-      }
-      .route-option-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      }
-      .route-option-header {
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
-        padding-bottom: 5px;
-        border-bottom: 1px dashed #ddd;
+        flex-wrap: wrap;
       }
-      .route-option-title {
-        font-size: 1.1rem;
-        font-weight: 600;
+
+      .history-details {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
-      .route-option-details {
-        font-size: 0.9rem;
+
+      .history-plate {
+        font-size: 22px;
+        font-weight: 700;
+        color: #d32f2f; /* Danger color for visibility */
+        background: #fff0f0;
+        padding: 5px 10px;
+        border-radius: 4px;
+      }
+
+      .history-location,
+      .history-time {
+        font-size: 14px;
         color: #666;
       }
-      .route-summary-cost {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--color-primary);
+
+      .history-time {
+        font-style: italic;
       }
-      .route-summary-time {
-        font-size: 1rem;
-        font-weight: 500;
-        color: var(--color-teal);
-      }
-      .route-steps-list {
-        list-style: none;
-        padding: 0;
-        margin-top: 10px;
-        font-size: 0.9rem;
-        border-top: 1px solid #eee;
-        padding-top: 10px;
-      }
-      .route-step {
-        padding: 5px 0;
-        border-left: 3px solid #f0f0f0;
-        padding-left: 10px;
-        margin-bottom: 5px;
-      }
-      .route-step-icon {
-        margin-right: 5px;
-        font-weight: 600;
-      }
-      /* Loading State */
-      #routeLoading {
+
+      #noHistoryMessage {
         text-align: center;
-        padding: 30px;
+        padding: 40px;
+        color: #999;
+        font-size: 16px;
+      }
+
+      /* Loading spinner for history */
+      #historyLoading {
+        text-align: center;
+        padding: 20px;
         color: #1976d2;
       }
-      /* Route Card Specific Colors */
-      .direct-auto {
-        background: #e3f2fd;
-        border: 1px solid #bbdefb;
-      }
-      .shared-auto {
-        background: #fffde7;
-        border: 1px solid #fff59d;
-      }
-      .train-combo {
-        background: #e8f5e9;
-        border: 1px solid #a5d6a7;
+
+      .history-map-link {
+        padding: 8px 15px;
+        background: #2196f3;
+        color: white;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.2s;
+        margin-top: 10px;
+        display: inline-block;
       }
 
-      /* FIX: Added style for highlighting active route */
-      .active-route {
-        border: 2px solid var(--color-primary);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      .history-map-link:hover {
+        background: #1976d2;
       }
 
-      @media (min-width: 1024px) {
-        .route-finder-layout {
-          grid-template-columns: 2fr 1fr;
+      @media (max-width: 600px) {
+        .history-card {
+          flex-direction: column;
+          align-items: flex-start;
         }
+
+        .history-details {
+          margin-bottom: 15px;
+        }
+
+        .history-map-link {
+          width: 100%;
+          text-align: center;
+        }
+      }
+
+      /* MODAL STYLES (Capture Source Modal - NEW) */
+      .capture-source-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .capture-modal-content {
+        background: white;
+        max-width: 450px;
+        width: 90%;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+      .capture-modal-content h3 {
+        color: #1a1a1a;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+      }
+      .capture-modal-content p {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 1rem;
+      }
+      .capture-modal-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        justify-content: center;
+      }
+      .capture-modal-buttons button {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      /* Existing modal for SOS */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-overlay.show {
+        display: flex;
       }
     </style>
   </head>
@@ -172,19 +183,18 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
       <div class="nav-container">
-        <!-- FIX: Kept the brand name consistent with other pages -->
         <div class="nav-brand">🛺 Mumbai Share Auto</div>
 
+        <!-- Desktop Navigation -->
         <ul class="nav-links" id="nav-links">
           <li><a href="index.html">Home</a></li>
           <li><a href="fare-calculator.html">Fare Calculator</a></li>
           <li><a href="stands-map.html">Find Stands</a></li>
-          <li><a href="route-finder.html" class="active">Route Finder</a></li>
-          <!-- CHANGED LINK: Points to Project 2's external host/port -->
-          <li><a href="http://localhost:5500">Booking</a></li>
-          <li><a href="safety.html">Safety</a></li>
+          <li><a href="route-finder.html">Route Finder</a></li>
+          <li><a href="safety.html" class="active">Safety</a></li>
         </ul>
 
+        <!-- Hamburger Menu Icon -->
         <button class="hamburger" aria-label="Open navigation menu">
           <span class="hamburger-line"></span>
           <span class="hamburger-line"></span>
@@ -193,6 +203,7 @@
       </div>
     </nav>
 
+    <!-- Mobile Menu -->
     <div class="mobile-menu-backdrop"></div>
     <div class="mobile-menu" aria-hidden="true">
       <button class="mobile-menu-close" aria-label="Close navigation menu">
@@ -202,138 +213,181 @@
         <li><a href="index.html">Home</a></li>
         <li><a href="fare-calculator.html">Fare Calculator</a></li>
         <li><a href="stands-map.html">Find Stands</a></li>
-        <li><a href="route-finder.html" class="active">Route Finder</a></li>
-        <!-- CHANGED LINK: Points to Project 2's external host/port -->
-        <li><a href="http://localhost:5500">Booking</a></li>
-        <li><a href="safety.html">Safety</a></li>
+        <li><a href="route-finder.html">Route Finder</a></li>
+        <li><a href="safety.html" class="active">Safety</a></li>
       </ul>
     </div>
 
+    <!-- Page Header -->
     <section class="page-header">
-      <h1>Multimodal Route Finder</h1>
+      <h1>Safety & Emergency Features</h1>
       <p class="subtitle">
-        Find the quickest and cheapest way to travel across Mumbai.
+        Stay safe while traveling with share autos — use our built-in safety
+        tools.
       </p>
     </section>
 
-    <main class="route-finder-layout">
-      <!-- Left Column: Map and Inputs -->
-      <section class="calculator-section" style="padding: 0; background: none">
+    <!-- Main Content - Features Grid -->
+    <section class="features-section">
+      <div class="features-container">
+        <h2 class="section-heading">Auto Safety Tools</h2>
         <div
-          class="calculator-card"
-          style="max-width: none; margin: 0; padding: 20px"
+          class="features-grid"
+          style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))"
         >
-          <form id="routeFinderForm">
-            <div class="input-group">
-              <!-- Start Location -->
-              <div class="form-group">
-                <label for="startLocationInput">Start Location</label>
-                <input
-                  type="text"
-                  id="startLocationInput"
-                  class="form-input"
-                  placeholder="Type start location or use map"
-                  required
-                />
-                <button
-                  type="button"
-                  id="pickStartOnMapBtn"
-                  class="location-input-btn"
-                  title="Pick on map"
-                >
-                  📍
-                </button>
-                <div id="startLocationError" class="error-message"></div>
-                <!-- Hidden inputs for coordinates -->
-                <input type="hidden" id="startLat" />
-                <input type="hidden" id="startLng" />
-              </div>
+          <!-- Feature 1: Emergency SOS -->
+          <div class="feature-card">
+            <h3>Emergency SOS</h3>
+            <button class="sos-button" id="sosButton">
+              🚨 SOS EMERGENCY 🚨
+            </button>
+            <div class="location-display" id="sosLocation">
+              <div class="label">CURRENT LOCATION:</div>
+              <div class="coords">Click SOS to fetch location</div>
+            </div>
+            <div class="success-message hidden" id="sosSuccess">
+              <p>✓ Emergency alert sent! Location shared with contacts.</p>
+            </div>
+            <div class="error-message hidden" id="sosError"></div>
+          </div>
 
-              <!-- End Location -->
-              <div class="form-group">
-                <label for="endLocationInput">End Location</label>
-                <input
-                  type="text"
-                  id="endLocationInput"
-                  class="form-input"
-                  placeholder="Type end location or use map"
-                  required
-                />
-                <button
-                  type="button"
-                  id="pickEndOnMapBtn"
-                  class="location-input-btn"
-                  title="Pick on map"
-                >
-                  🎯
-                </button>
-                <div id="endLocationError" class="error-message"></div>
-                <!-- Hidden inputs for coordinates -->
-                <input type="hidden" id="endLat" />
-                <input type="hidden" id="endLng" />
+          <!-- Feature 2: Auto Number Capture -->
+          <div class="feature-card">
+            <h3>Auto Number Capture (AI)</h3>
+            <button class="upload-button" id="uploadButton">
+              📷 Capture/Upload Plate Photo
+            </button>
+            <!-- Hidden inputs for camera/gallery. capture="camera" forces camera on mobile. -->
+            <input
+              type="file"
+              id="fileInputCamera"
+              accept="image/*"
+              capture="camera"
+              style="display: none"
+            />
+            <input
+              type="file"
+              id="fileInputGallery"
+              accept="image/*"
+              style="display: none"
+            />
+            <div class="preview-area" id="previewArea">
+              <div class="preview-placeholder">
+                Photo preview will appear here
               </div>
             </div>
-
-            <div class="button-group">
-              <button
-                type="button"
-                id="findRouteBtn"
-                class="btn btn-primary full-width"
-              >
-                Find Routes
-              </button>
-              <button
-                type="button"
-                id="resetBtn"
-                class="btn btn-secondary"
-                style="width: 120px"
-              >
-                Reset
-              </button>
+            <div class="metadata hidden" id="photoMetadata">
+              <div>
+                <label>License Plate:</label>
+                <span id="extractedPlate">---</span>
+              </div>
+              <div>
+                <label>Captured At:</label> <span id="photoTimestamp">---</span>
+              </div>
+              <div>
+                <label>Location:</label> <span id="photoLocation">---</span>
+              </div>
             </div>
-          </form>
-
-          <div id="mapContainer" style="margin-top: 20px"></div>
-        </div>
-      </section>
-
-      <!-- Right Column: Results Panel -->
-      <section id="resultsPanel">
-        <div id="resultsContainer" style="padding: 0">
-          <h2
-            id="resultsHeader"
-            class="section-heading"
-            style="text-align: left; margin: 0 0 10px 0"
-          >
-            Available Routes
-          </h2>
-
-          <div id="routeLoading" style="display: block">
-            <div
-              class="spinner-overlay"
-              style="position: relative; height: 100px; padding: 0"
-            >
-              <div class="spinner"></div>
-              <!-- FIX: Initial loading text updated to match JS changes -->
-              <p>Enter locations to find travel options</p>
+            <div class="error-message hidden" id="uploadError"></div>
+            <div class="success-message hidden" id="captureSuccess">
+              Plate Captured! History Updated.
             </div>
           </div>
 
-          <div id="routeCardsContainer">
-            <!-- Route options will be dynamically inserted here -->
-          </div>
-
-          <div
-            id="noResultsMessage"
-            class="no-results-message"
-            style="display: none"
-          >
-            Could not find any suitable routes. Try adjusting your start/end
-            locations.
+          <!-- Feature 3: Night Mode Safety -->
+          <!-- Hidden by default, shown by JS only if time criteria are met -->
+          <div class="feature-card hidden" id="nightModeCard">
+            <h3>Night Mode Safety</h3>
+            <div class="toggle-section">
+              <div class="toggle-row">
+                <label>Enable Live Tracking</label>
+                <div class="toggle-switch" id="nightModeToggle">
+                  <div class="slider"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Status message is now dynamic and can show the license plate -->
+            <div class="status-message hidden" id="nightModeStatus">
+              ✓ Night mode active — location tracking enabled.
+            </div>
+            <div class="coordinates-display hidden" id="nightModeCoords">
+              <div class="label">LIVE LOCATION TRACKING (2 min interval)</div>
+              <!-- New display element for the captured plate -->
+              <div
+                class="coords"
+                id="nightModePlateDisplay"
+                style="font-weight: 600; color: #2196f3; margin-bottom: 5px"
+              >
+                Auto Plate: N/A
+              </div>
+              <div class="coords" id="nightModeLocation">
+                Lat: 0.0000, Long: 0.0000
+              </div>
+              <div class="timestamp" id="nightModeTimestamp">
+                Updated: 00:00:00
+              </div>
+            </div>
+            <div class="error-message hidden" id="nightModeError"></div>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+
+    <!-- NEW SECTION: Capture History -->
+    <section class="history-section">
+      <h2 class="section-heading">Auto Number Capture History</h2>
+      <p id="historyLoading">Loading history...</p>
+      <div id="captureHistoryList">
+        <!-- Dynamic history cards will be inserted here -->
+      </div>
+      <div id="noHistoryMessage" style="display: none">
+        <p>You have no saved auto number captures yet.</p>
+      </div>
+    </section>
+
+    <!-- Confirmation Modal for SOS -->
+    <div class="modal-overlay" id="sosModal">
+      <div class="modal-content">
+        <h3>⚠️ Trigger Emergency Alert?</h3>
+        <p>This will share your location with emergency contacts.</p>
+        <div class="modal-buttons">
+          <button class="btn-cancel" id="modalCancel">Cancel</button>
+          <button class="btn-confirm" id="modalConfirm">Confirm Alert</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW MODAL: Auto Capture Source Selector -->
+    <div class="modal-overlay hidden" id="captureSourceModal">
+      <div class="capture-modal-content">
+        <h3>Choose Photo Source</h3>
+        <p>
+          Select whether to take a new photo with your camera or choose one from
+          your gallery.
+        </p>
+        <div class="capture-modal-buttons">
+          <button class="btn-primary" id="selectCameraBtn">
+            📸 Take Photo with Camera
+          </button>
+          <button
+            class="btn-secondary"
+            id="selectGalleryBtn"
+            style="background: #e0e0e0; color: #333"
+          >
+            🖼️ Select from Gallery
+          </button>
+        </div>
+        <button
+          class="modal-close"
+          id="closeCaptureSourceModal"
+          style="position: absolute; top: 10px; right: 10px"
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+
+    <!-- Night Mode Capture Prompt (REMOVED: Old modal is replaced by inline logic) -->
 
     <!-- Footer -->
     <footer class="footer">
@@ -353,8 +407,6 @@
             <a href="fare-calculator.html">Fare Calculator</a>
             <a href="stands-map.html">Find Stands</a>
             <a href="route-finder.html">Route Finder</a>
-            <!-- CHANGED LINK: Points to Project 2's external host/port -->
-            <a href="http://localhost:5500">Booking</a>
             <a href="safety.html">Safety</a>
           </nav>
         </div>
@@ -362,22 +414,21 @@
     </footer>
 
     <noscript>For the best experience, please enable JavaScript</noscript>
-
-    <!-- Leaflet JS -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
-    <!-- Leaflet Routing Machine JS (for OSRM) -->
-    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-    <!-- Nominatim Geocoding JS -->
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
-    <script src="js/auth.js"></script>
     <script src="script.js"></script>
     <script src="js/locationService.js"></script>
-    <!-- New route-finder.js (needs to be created/updated) -->
-    <script src="route-finder.js"></script>
+    <script src="safety.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+      // Check authentication immediately
+      if (!window.isLoggedIn()) {
+        window.location.href = "login.html";
+      }
+      // FIX: Remove the redundant, early call to the loading function from the footer script
+      window.loadCaptureHistory =
+        window.loadCaptureHistory ||
+        function () {
+          console.log("History loading function not yet initialized.");
+        };
+    </script>
   </body>
 </html>
